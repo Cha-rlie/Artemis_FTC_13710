@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 
-public class Artemis_TeleOP extends LinearOpMode {
+public class Artemis_TeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -45,12 +45,26 @@ public class Artemis_TeleOP extends LinearOpMode {
 
             telemetry.addData("Status", "TeleOp Running");
 
+            // Initialise the input values from first controller for the drive base
+            float XInput = (float)(this.gamepad1.right_stick_x*1.1); // Account for imperfect strafing
+            float YInput = -this.gamepad1.left_stick_y; // One side needs to be reversed
+            float RInput = this.gamepad1.right_stick_x;
+
+            // Initialise the input values from the second controller for the dual intake system
             boolean inputLeftStatus = this.gamepad2.a;
             int inputLeftManual = (int)this.gamepad2.left_stick_x;
 
-            Automated_Movement_Functions movement = new Automated_Movement_Functions();
+            // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
+            double ratioScalingDenominator = Math.max(Math.abs(YInput) + Math.abs(XInput) + Math.abs(RInput), 1);
 
-            movement.manualViperTest(inputLeftManual, IntakeLeft);
+            // Drive the drive base with mecanum code
+            UpLeft.setPower((YInput + XInput + RInput) / ratioScalingDenominator);
+            UpRight.setPower((YInput - XInput - RInput) / ratioScalingDenominator);
+            DownLeft.setPower((YInput - XInput + RInput) / ratioScalingDenominator);
+            DownRight.setPower((YInput + XInput - RInput) / ratioScalingDenominator);
+
+            // Code to test the left intake motor
+            IntakeLeft.setPower(inputLeftManual);
 
         }
 
