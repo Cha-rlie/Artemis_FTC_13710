@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-// Import the necessary modules and classes
+// Import the necessary custom-made classes
+
+// Import the necessary FTC modules and classes
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+//import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp
 
@@ -16,7 +18,7 @@ public class Artemis_TeleOP extends LinearOpMode {
     public void runOpMode() {
 
         // Initialising the motors up for drive base
-        SampleMecanumDrive driveBase = new SampleMecanumDrive(hardwareMap);
+        //SampleMecanumDrive driveBase = new SampleMecanumDrive(hardwareMap);
 
         DcMotorEx UpLeft = hardwareMap.get(DcMotorEx.class, "UpLeft");
         DcMotorEx UpRight = hardwareMap.get(DcMotorEx.class, "UpRight");
@@ -44,7 +46,11 @@ public class Artemis_TeleOP extends LinearOpMode {
             telemetry.addData("Status", "TeleOp Running");
 
             boolean inputLeftStatus = this.gamepad2.a;
-            float inputLeftManual = this.gamepad2.left_stick_x;
+            int inputLeftManual = (int)this.gamepad2.left_stick_x;
+
+            Automated_Movement_Functions movement = new Automated_Movement_Functions();
+
+            movement.manualViperTest(inputLeftManual, IntakeLeft);
 
         }
 
