@@ -52,11 +52,8 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // Initialise the input values from the second controller for the dual intake system
             //boolean inputLeftStatus = this.gamepad2.a;
-            boolean intakeDepositStatus = true;
-            float leftIntakeInput = this.gamepad2.left_stick_y;
-            float rightIntakeInput = this.gamepad2.right_stick_y;
-            float leftDepositInput = this.gamepad2.left_stick_y;
-            float rightDepositInput = this.gamepad2.right_stick_y;
+            float intakeInput = this.gamepad2.left_stick_y;
+            float depositInput = this.gamepad2.right_stick_y;
 
 
             // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
@@ -69,22 +66,15 @@ public class Artemis_TeleOp extends LinearOpMode {
             DownRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // Code to test the MANUALLY test the intake and deposit systems
-            if (this.gamepad2.a) {
-                intakeDepositStatus = true;
-            }
-            if (this.gamepad2.b) {
-                intakeDepositStatus = false;
-            }
+            IntakeLeft.setPower(intakeInput);
+            IntakeRight.setPower(intakeInput);
 
-            if (intakeDepositStatus) {
-                IntakeLeft.setPower(leftIntakeInput);
-                IntakeRight.setPower(rightIntakeInput);
-            }
-            else {
-                DepositLeft.setPower(leftDepositInput);
-                DepositRight.setPower(rightDepositInput);
-            }
+            DepositLeft.setPower(depositInput);
+            DepositRight.setPower(depositInput);
 
+            // Print out Encoder Values to the driver station
+            telemetry.addData("Intake",(int)((IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2));
+            telemetry.addData("Deposit",(int)((DepositLeft.getCurrentPosition()+DepositRight.getCurrentPosition())/2));
         }
 
     }
