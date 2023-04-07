@@ -14,13 +14,22 @@ Contact us at artemis13710@gmail.com
 * Manual control for intake and deposit systems
 
 #### Gamepad Command Map
-| Command           | Description                    |
+
+#### Controller A
+| Control           | Function                    |
 |-------------------|--------------------------------|
-| Pad1 LeftStick X  | Drives Turning                 |
-| Pad1 RightStick X | Drives Left and Right Strafing |
-| Pad1 RightStick Y | Drives Forwards and Backwards  |
-| Pad2 LeftStick Y  | Controls Intake System         |
-| Pad2 RightStick Y | Controls Deposit System        |
+| Left Stick X  | Turns robot                 |
+| Right Stick X | Strafes left or right |
+| Right Stick Y | Drives forward or backwards  |
+
+
+| Control           | Function                    |
+|-------------------|--------------------------------|
+| Left Stick Y  | Extends Intake System         |
+| Right Stick Y | Extends Deposit System        |
+
+#### Controller B
+
 
 ## Thank You
 Thank you for reading this far!
