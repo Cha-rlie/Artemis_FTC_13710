@@ -21,13 +21,22 @@ Contact us at artemis13710@gmail.com
 | Left Stick X  | Turns robot                 |
 | Right Stick X | Strafes left or right       |
 | Right Stick Y | Drives forward or backwards |
-
+| Left Bumper | Halves speed of robot |
+| Right Bumper | Doubles speed of robot |
 
 #### Controller B
 | Control       | Function                             |
 |---------------|--------------------------------------|
 | Left Stick Y  | Extend or Compresses Intake System   |
-| Right Stick Y | Extends or Compresses Deposit System |
+| Right Stick Y | Rotates V4B |
+| Dpad Up and Down | Extends or Compresses Deposit System |
+| Dpad Left | Automatically scores on medium junction position (Using encoder values)|
+| Dpad Right | Automatically scores on high junction position (Using encoder values)| 
+| A | Opens and Closes Claw |
+| B | Transfer cone onto deposit platform (Requires movement of both SpinClaw and V4B, and perhaps RotateClaw) | 
+| X | Spin claw 90 degrees (facing downwards), or reverts to vertical position for normal intaking |
+
+
 
 
 ### Devices
@@ -44,10 +53,10 @@ Contact us at artemis13710@gmail.com
 **_Deposit:_**
 | Variable Name       | Function                  | How is it controlled? |
 |---------------|--------------------------------------| --------- |
-| Latch  | Hold cone while on deposit platform to prevent it from flying off   | Button press |
+| Latch  | Hold cone while on deposit platform to prevent it from flying off   | Automatically controlled, linked to the movement of the deposit |
 
 
-* Need to be coded immediately
+\* Need to be coded immediately
 
 ## Thank You
 Thank you for reading this far!
