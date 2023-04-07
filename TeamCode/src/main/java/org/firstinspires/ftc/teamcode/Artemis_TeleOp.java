@@ -59,17 +59,17 @@ public class Artemis_TeleOp extends LinearOpMode {
             // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
             double ratioScalingDenominator = Math.max(Math.abs(yInput) + Math.abs(xInput) + Math.abs(rInput), 1);
 
-            // Drive the drive base with mecanum code
+            // Drive the drive base with mecanum code\
             UpLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
             UpRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
             DownLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
             DownRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // Code to test the MANUALLY test the intake and deposit systems
-            IntakeLeft.setPower(intakeInput);
+            IntakeLeft.setPower(-intakeInput);
             IntakeRight.setPower(intakeInput);
 
-            DepositLeft.setPower(depositInput);
+            DepositLeft.setPower(-depositInput);
             DepositRight.setPower(depositInput);
 
             // Print out Encoder Values to the driver station
