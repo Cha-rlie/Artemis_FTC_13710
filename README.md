@@ -16,18 +16,18 @@ Contact us at artemis13710@gmail.com
 #### Gamepad Command Map
 
 #### Controller A
-| Control           | Function                    |
-|-------------------|--------------------------------|
+| Control       | Function                    |
+|---------------|-----------------------------|
 | Left Stick X  | Turns robot                 |
-| Right Stick X | Strafes left or right |
-| Right Stick Y | Drives forward or backwards  |
+| Right Stick X | Strafes left or right       |
+| Right Stick Y | Drives forward or backwards |
 
 
 #### Controller B
-| Control           | Function                    |
-|-------------------|--------------------------------|
-| Left Stick Y  | Extends Intake System         |
-| Right Stick Y | Extends Deposit System        |
+| Control       | Function                             |
+|---------------|--------------------------------------|
+| Left Stick Y  | Extend or Compresses Intake System   |
+| Right Stick Y | Extends or Compresses Deposit System |
 
 ## Thank You
 Thank you for reading this far!
