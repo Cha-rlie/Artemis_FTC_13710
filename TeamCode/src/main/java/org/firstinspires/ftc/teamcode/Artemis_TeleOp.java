@@ -66,10 +66,10 @@ public class Artemis_TeleOp extends LinearOpMode {
             DownRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // Code to test the MANUALLY test the intake and deposit systems
-            IntakeLeft.setPower(-intakeInput);
+            IntakeLeft.setPower(intakeInput);
             IntakeRight.setPower(intakeInput);
 
-            DepositLeft.setPower(-depositInput);
+            DepositLeft.setPower(depositInput);
             DepositRight.setPower(depositInput);
 
             // Print out Encoder Values to the driver station
