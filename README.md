@@ -27,9 +27,9 @@ Contact us at artemis13710@gmail.com
 #### Controller B
 | Control       | Function                             |
 |---------------|--------------------------------------|
-| Left Stick Y  | Extend or Compresses Intake System   |
+| Left Stick Y  | Extend or Retracts Intake System   |
 | Right Stick Y | Rotates V4B |
-| Dpad Up and Down | Extends or Compresses Deposit System |
+| Dpad Up and Down | Extends or Retracts Deposit System |
 | Dpad Left | Automatically scores on medium junction position (Using encoder values)|
 | Dpad Right | Automatically scores on high junction position (Using encoder values)| 
 | A | Opens and Closes Claw |
