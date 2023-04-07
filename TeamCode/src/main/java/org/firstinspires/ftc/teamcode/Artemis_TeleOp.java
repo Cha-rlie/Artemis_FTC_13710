@@ -47,8 +47,8 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // Initialise the input values from first controller for the drive base
             float xInput = (float)(this.gamepad1.right_stick_x*1.1); // Account for imperfect strafing
-            float yInput = -this.gamepad1.left_stick_y; // One side needs to be reversed
-            float rInput = this.gamepad1.right_stick_x;
+            float yInput = -this.gamepad1.right_stick_y; // One side needs to be reversed
+            float rInput = this.gamepad1.left_stick_x;
 
             // Initialise the input values from the second controller for the dual intake system
             //boolean inputLeftStatus = this.gamepad2.a;

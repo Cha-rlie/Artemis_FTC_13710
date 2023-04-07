@@ -16,7 +16,8 @@ Contact us at artemis13710@gmail.com
 #### Gamepad Command Map
 | Command           | Description                    |
 |-------------------|--------------------------------|
-| Pad1 LeftStick X  | Drives Left, Right and Turning |
+| Pad1 LeftStick X  | Drives Turning                 |
+| Pad1 RightStick X | Drives Left and Right Strafing |
 | Pad1 RightStick Y | Drives Forwards and Backwards  |
 | Pad2 LeftStick Y  | Controls Intake System         |
 | Pad2 RightStick Y | Controls Deposit System        |
