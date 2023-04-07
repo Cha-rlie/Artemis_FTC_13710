@@ -23,13 +23,11 @@ Contact us at artemis13710@gmail.com
 | Right Stick Y | Drives forward or backwards  |
 
 
+#### Controller B
 | Control           | Function                    |
 |-------------------|--------------------------------|
 | Left Stick Y  | Extends Intake System         |
 | Right Stick Y | Extends Deposit System        |
-
-#### Controller B
-
 
 ## Thank You
 Thank you for reading this far!
