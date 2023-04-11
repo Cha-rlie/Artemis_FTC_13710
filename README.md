@@ -42,18 +42,18 @@ Contact us at artemis13710@gmail.com
 ### Devices
 
 **_Intake:_**
-| Variable Name       | Function                  | How is it controlled? |
-|---------------|--------------------------------------| --------- |
-| Claw  | Grab and Drop Cone    | Button press |
-| SpinClaw | Spins the claw around to face the back of the robot, used for the cone transfer | Automated button press |
-| RotateClaw* | Rotates the claw down to face the ground, to intake fallen over cones + aid with intaking from the stack in auto | Button press + controlled independently in auto |
-| V4B* | Two servos, driving the same mechanism. Powers the arm like mechanism mounted on the dlies, moving the claw in an arc. Powered by two servos, will need to spin in opposite directions cause they are mirrored | Mostly automated, but manual control is needed (joystick) |
+| Pin | Device Name       | Function                  | How is it controlled? |
+|---|-------------|--------------------------------------| --------- |
+| C0 | Claw  | Grab and Drop Cone    | Button press |
+| C1 | SpinClaw | Spins the claw around to face the back of the robot, used for the cone transfer | Automated button press |
+| C2 | RotateClaw* | Rotates the claw down to face the ground, to intake fallen over cones + aid with intaking from the stack in auto | Button press + controlled independently in auto |
+| E0 & E1 | V4B* | Two servos, driving the same mechanism. Powers the arm like mechanism mounted on the dlies, moving the claw in an arc. Powered by two servos, will need to spin in opposite directions cause they are mirrored | Mostly automated, but manual control is needed (joystick) |
 
 
 **_Deposit:_**
-| Variable Name       | Function                  | How is it controlled? |
-|---------------|--------------------------------------| --------- |
-| Latch  | Hold cone while on deposit platform to prevent it from flying off   | Automatically controlled, linked to the movement of the deposit |
+| Pin | Device Name       | Function                  | How is it controlled? |
+|---|-------------|--------------------------------------| --------- |
+| C3 |Latch  | Hold cone while on deposit platform to prevent it from flying off   | Automatically controlled, linked to the movement of the deposit |
 
 
 \* Need to be coded immediately
