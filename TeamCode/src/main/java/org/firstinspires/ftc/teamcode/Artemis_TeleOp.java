@@ -33,7 +33,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         // Initialising the servos
         //Servo Claw = hardwareMap.get(Servo.class, "Claw");
-        Servo SpinClaw = hardwareMap.get(Servo.class,"SpinClaw");
+        //Servo SpinClaw = hardwareMap.get(Servo.class,"SpinClaw");
         Servo RotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
         Servo V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
         Servo V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
@@ -98,15 +98,15 @@ public class Artemis_TeleOp extends LinearOpMode {
             if (clawInput) {
                 //Claw.setPosition(Claw.getPosition()+0.2);
             }
-            if (spinClaw) {
+            /*if (spinClaw) {
                 SpinClaw.setPosition(1);
-            }
+            }*/
             if (rotateClaw) {
                 RotateClaw.setPosition(0.5);
             }
 
             V4B_1.setPosition(V4B_1.getPosition()+(V4BInput/10));
-            V4B_2.setPosition(V4B_2.getPosition()+(V4BInput/10));
+            V4B_2.setPosition(V4B_2.getPosition()-(V4BInput/10));
 
         }
 
