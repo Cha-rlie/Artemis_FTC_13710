@@ -6,7 +6,11 @@ Check out our [YouTube Channel](https://www.youtube.com/@artemis13710)
 Check out our [website](https://sites.google.com/view/artemis13710/)
 Contact us at artemis13710@gmail.com
 
-## Features of Code
+## Naming Conventions
+* Everything mostly uses camel case
+* Motors, servors and devices in general start with a captial (e.g. ) 
+
+## Code Files
 ### Artemis_TeleOp
 * Takes input from two gamepads
 * Allows for movement in all directions
