@@ -62,5 +62,8 @@ Contact us at artemis13710@gmail.com
 
 \* Need to be coded immediately
 
+## Disclaimer
+This entire repo is under the MIT License meaning you can use this coode as you please. Look at it, learn from it and use it all you want. :)
+
 ## Thank You
 Thank you for reading this far!
