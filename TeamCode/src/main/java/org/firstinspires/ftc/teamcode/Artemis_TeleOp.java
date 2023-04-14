@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -21,12 +22,14 @@ public class Artemis_TeleOp extends LinearOpMode {
         //SampleMecanumDrive driveBase = new SampleMecanumDrive(hardwareMap);
 
         DcMotorEx FrontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
+        FrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         DcMotorEx FrontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
         DcMotorEx RearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
         DcMotorEx RearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
 
         // Initialising the motors for the dual-intake system
         DcMotorEx IntakeLeft = hardwareMap.get(DcMotorEx.class, "IntakeLeft");
+        IntakeLeft.setDirection(DcMotorEx.Direction.REVERSE);
         DcMotorEx IntakeRight = hardwareMap.get(DcMotorEx.class, "IntakeRight");
         DcMotorEx DepositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
         DcMotorEx DepositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
@@ -35,8 +38,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         //Servo Claw = hardwareMap.get(Servo.class, "Claw");
         //Servo SpinClaw = hardwareMap.get(Servo.class,"SpinClaw");
         Servo RotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
-        Servo V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
-        Servo V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
+        //Servo V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
+        //Servo V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
         //Servo Latch = hardwareMap.get(Servo.class, "Latch");
 
         // Communicating with the driver station
@@ -58,14 +61,16 @@ public class Artemis_TeleOp extends LinearOpMode {
             // Initialise the input values from the second controller for the dual intake system
             float intakeInput = this.gamepad2.left_stick_y;
             float V4BInput = this.gamepad2.right_stick_y;
+            float rotateClaw = this.gamepad2.right_stick_y;
             boolean depositInputUp = this.gamepad2.dpad_up;
             boolean depositInputDown = this.gamepad2.dpad_down;
             boolean mediumJunctionScore = this.gamepad2.dpad_left;
             boolean highJunctionScore = this.gamepad2.dpad_right;
             boolean clawInput = this.gamepad2.a;
             boolean transportCone = this.gamepad2.b;
-            boolean rotateClaw = this.gamepad2.x;
+            //boolean rotateClaw = this.gamepad2.x;
             boolean spinClaw = this.gamepad2.y;
+            telemetry.addData("Y_Button", this.gamepad2.y);
 
 
             // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
@@ -108,13 +113,21 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
             /*if (spinClaw) {
                 SpinClaw.setPosition(1);
-            }*/
-            if (rotateClaw) {
-                RotateClaw.setPosition(0.5);
             }
+            if (rotateClaw) {
+                RotateClaw.setPosition(RotateClaw.getPosition()+(V4BInput/10));
+            }*/
 
-            V4B_1.setPosition(V4B_1.getPosition()+(V4BInput/10));
-            V4B_2.setPosition(V4B_2.getPosition()-(V4BInput/10));
+            /*V4B_1.setPosition(V4B_1.getPosition()+(V4BInput/100));
+            V4B_2.setPosition(V4B_2.getPosition()-(V4BInput/100));
+            telemetry.addData("V4B_1", V4B_1.getPosition()+(V4BInput/100));
+            telemetry.addData("V4B_2", V4B_2.getPosition()+(V4BInput/100));*/
+
+            RotateClaw.setPosition(RotateClaw.getPosition()+(rotateClaw/100));
+            telemetry.addData("RotateClaw", RotateClaw.getPosition()+(V4BInput/100));
+
+            // Update the telemetry's information screen
+            telemetry.update();
 
         }
 
