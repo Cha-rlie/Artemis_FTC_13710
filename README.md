@@ -40,6 +40,8 @@ Contact us at artemis13710@gmail.com
 | A | Opens and Closes Claw |
 | B | Transfer cone onto deposit platform (Requires movement of both SpinClaw and V4B, and perhaps RotateClaw) | 
 | X | Spin claw 90 degrees (facing downwards), or reverts to vertical position for normal intaking |
+| Y | Return V4B to the home position (intaking) |
+
 =======
 | Left Bumper   | Halves speed of robot       |
 | Right Bumper  | Doubles speed of robot      |
