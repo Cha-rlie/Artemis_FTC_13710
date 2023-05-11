@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
+import org.firstinspires.ftc.teamcode.Artemis_Functions;
 
 // Import the necessary FTC modules and classes
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,9 +16,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Artemis_TeleOp extends LinearOpMode {
 
+    Artemis_Functions artemis_functions;
+
+    public void cycle(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, int IntakeOut) {
+        IntakeLeft.setTargetPosition(IntakeOut);
+        IntakeRight.setTargetPosition(IntakeOut);
+        IntakeLeft.setPower(1);
+        IntakeRight.setPower(1);
+    }
+
     @Override
     public void runOpMode() {
-        boolean GroundIntake = false; // Is the CLaw facing the ground?
+        boolean GroundIntake = false; // Is the Claw facing the ground?
+        boolean ClawBackwards = false; // Is the Claw facing backwards?
         boolean buttonIsReleased = true; // Handling debounce issues
         boolean AbuttonIsReleased = true;
         boolean ClawState = true; // True = open
@@ -30,11 +41,11 @@ public class Artemis_TeleOp extends LinearOpMode {
         double ClosedClawPos = 0.116; // Position where claw is closed
         double OpenClawPos = 0.2994; // Position where claw is open
 
-        double ClawFowardPos = 0;
-        double ClawBackwardsPos = 0.7;
+        double ClawFowardPos = 0.18;
+        double ClawBackwardsPos = 0.9;
 
-        int IntakeHome = 955; // Fully contracted position
-        int IntakeOut = -1050; // Fully extended position
+        int IntakeHome = 0; // Fully contracted position
+        int IntakeOut = -2000; // Fully extended position -2100
 
 
         // Initialising the motors up for drive base
@@ -49,19 +60,15 @@ public class Artemis_TeleOp extends LinearOpMode {
         // Initialising the motors for the dual-intake system
 
         DcMotorEx IntakeLeft = hardwareMap.get(DcMotorEx.class, "IntakeLeft");
-        IntakeLeft.setDirection(DcMotorEx.Direction.REVERSE);
         DcMotorEx IntakeRight = hardwareMap.get(DcMotorEx.class, "IntakeRight");
+        IntakeRight.setDirection(DcMotorEx.Direction.REVERSE);
+        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        IntakeLeft.setTargetPosition(IntakeHome);
-        IntakeRight.setTargetPosition(IntakeHome);
-        IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-         /*
         DcMotorEx DepositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
         DcMotorEx DepositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
-*/
+        DepositRight.setDirection(DcMotorEx.Direction.REVERSE);
+
 
         // Initialising the servos
         Servo Claw = hardwareMap.get(Servo.class, "Claw");
@@ -76,7 +83,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         V4B_2.setPosition(V4B_2_HomePos);
         RotateClaw.setPosition(RotateClaw_HomePos);
         Claw.setPosition(ClosedClawPos);
-        // SpinClaw.setPosition(ClawFowardPos);
+        SpinClaw.setPosition(ClawFowardPos);
+
 
 
         // Communicating with the driver station
@@ -87,6 +95,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
+            RotateClaw.setPosition(RotateClaw_HomePos);
 
             telemetry.addData("Status", "TeleOp Running");
 
@@ -96,7 +105,6 @@ public class Artemis_TeleOp extends LinearOpMode {
             float rInput = this.gamepad1.left_stick_x;
 
             // Initialise the input values from the second controller for the dual intake system
-            float intakeInput = this.gamepad2.left_stick_y;
             float V4BInput = this.gamepad2.right_stick_y;
             boolean depositInputUp = this.gamepad2.dpad_up;
             boolean depositInputDown = this.gamepad2.dpad_down;
@@ -115,9 +123,6 @@ public class Artemis_TeleOp extends LinearOpMode {
             RearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // MANUALLY move the intake and deposit systems
-
-            IntakeLeft.setPower(intakeInput/2);
-            IntakeRight.setPower(intakeInput/2);
  /*
             if (depositInputUp && depositInputDown) {}
             else if (depositInputUp) {
@@ -130,21 +135,28 @@ public class Artemis_TeleOp extends LinearOpMode {
 */
 
             // Print out Encoder Values to the driver station
-            telemetry.addData("IntakeL", IntakeLeft.getCurrentPosition());
-            telemetry.addData("IntakeR", IntakeRight.getCurrentPosition());
-           // telemetry.addData("Deposit",(int)((DepositLeft.getCurrentPosition()+DepositRight.getCurrentPosition())/2));
+            telemetry.addData("Deposit Left", DepositLeft.getCurrentPosition());
+            telemetry.addData("Deposit Right", DepositRight.getCurrentPosition());
+            telemetry.addData("Intake Left", IntakeLeft.getCurrentPosition());
+            telemetry.addData("Intake Right", IntakeRight.getCurrentPosition());
 
-//            if(gamepad2.left_stick_y > 0.5) {
-//                IntakeLeft.setTargetPosition(IntakeHome);
-//                IntakeRight.setTargetPosition(IntakeHome);
-//            } else if(gamepad2.left_stick_y < -0.5) {
-//                IntakeLeft.setTargetPosition(IntakeOut);
-//                IntakeRight.setTargetPosition(IntakeOut);
-//            } else {
-//                IntakeLeft.setTargetPosition(IntakeLeft.getCurrentPosition());
-//                IntakeRight.setTargetPosition(IntakeRight.getCurrentPosition());
-//            }
-//
+            if(gamepad2.left_stick_y > 0.5) {
+                IntakeLeft.setTargetPosition(IntakeHome);
+                IntakeRight.setTargetPosition(IntakeHome);
+            } else if(gamepad2.left_stick_y < -0.5) {
+                IntakeLeft.setTargetPosition(IntakeOut);
+                IntakeRight.setTargetPosition(IntakeOut);
+            } else {
+                IntakeLeft.setTargetPosition(IntakeLeft.getCurrentPosition());
+                IntakeRight.setTargetPosition(IntakeRight.getCurrentPosition());
+            }
+
+            if(gamepad2.left_bumper) {
+                RotateClaw.setPosition(RotateClaw.getPosition()+0.02);
+            } else if (gamepad2.right_bumper) {
+                RotateClaw.setPosition(RotateClaw.getPosition()-0.02);
+            }
+
 
 
             // Handling debounce issues
@@ -152,10 +164,10 @@ public class Artemis_TeleOp extends LinearOpMode {
                 if (buttonIsReleased) {
                     buttonIsReleased = false;
                     if(!GroundIntake) {
-                        RotateClaw.setPosition(0.860);
+                        RotateClaw.setPosition(0.78);
                         GroundIntake = true;
                     } else if(GroundIntake) {
-                        RotateClaw.setPosition(0.631);
+                        RotateClaw.setPosition(0.68);
                         GroundIntake = false;
                     }
                 }
@@ -178,11 +190,31 @@ public class Artemis_TeleOp extends LinearOpMode {
                 AbuttonIsReleased = true;
             }
 
+            if(this.gamepad2.b) {
+                if (buttonIsReleased) {
+                    buttonIsReleased = false;
+                    if(!ClawBackwards) {
+                        SpinClaw.setPosition(ClawFowardPos);
+                        ClawBackwards = true;
+                    } else if(ClawBackwards) {
+                        SpinClaw.setPosition(ClawBackwardsPos);
+                        ClawBackwards = false;
+                    }
+                }
+            } else {
+                buttonIsReleased = true;
+            }
+
 
             if(this.gamepad2.y) {
                 V4B_1.setPosition(V4B_1_HomePos);
                 V4B_2.setPosition(V4B_2_HomePos);
             }
+
+            IntakeLeft.setPower(1);
+            IntakeRight.setPower(1);
+            IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             V4B_1.setPosition(V4B_1.getPosition()+(V4BInput*2/200));
             V4B_2.setPosition(V4B_2.getPosition()-(V4BInput*2/200));
