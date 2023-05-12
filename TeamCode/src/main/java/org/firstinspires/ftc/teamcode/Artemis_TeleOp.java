@@ -33,19 +33,23 @@ public class Artemis_TeleOp extends LinearOpMode {
         boolean AbuttonIsReleased = true;
         boolean ClawState = true; // True = open
 
-        double V4B_1_HomePos = 0.83; // Position where V4B is ready for intaking
-        double V4B_2_HomePos = 0.14;
+        double V4B_1_HomePos = 0.7877; // Position where V4B is ready for intaking
+        double V4B_2_HomePos = 0.1805;
+        double V4B_1_TransferPos = 0.4683; // Position where V4B is ready for transfer
+        double V4B_2_TransferPos = 0.4927;
 
         double RotateClaw_HomePos = 0.631; // Position where RotateClaw is ready for intaking
+        double RotateClaw_desiredPos = RotateClaw_HomePos;
 
         double ClosedClawPos = 0.116; // Position where claw is closed
         double OpenClawPos = 0.2994; // Position where claw is open
 
-        double ClawFowardPos = 0.18;
-        double ClawBackwardsPos = 0.9;
+        double ClawFowardPos = 0.9;
+        double ClawBackwardsPos = 0.18;
 
         int IntakeHome = 0; // Fully contracted position
         int IntakeOut = -2000; // Fully extended position -2100
+        int TransferPosition = -1100;
 
 
         // Initialising the motors up for drive base
@@ -83,6 +87,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         V4B_2.setPosition(V4B_2_HomePos);
         RotateClaw.setPosition(RotateClaw_HomePos);
         Claw.setPosition(ClosedClawPos);
+       // SpinClaw.setPosition(ClawFowardPos);
+
         SpinClaw.setPosition(ClawFowardPos);
 
 
@@ -95,7 +101,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
-            RotateClaw.setPosition(RotateClaw_HomePos);
+            RotateClaw.setPosition(RotateClaw_desiredPos);
 
             telemetry.addData("Status", "TeleOp Running");
 
@@ -152,9 +158,9 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
             if(gamepad2.left_bumper) {
-                RotateClaw.setPosition(RotateClaw.getPosition()+0.02);
+                RotateClaw_desiredPos += 0.02;
             } else if (gamepad2.right_bumper) {
-                RotateClaw.setPosition(RotateClaw.getPosition()-0.02);
+                RotateClaw_desiredPos -= 0.02;
             }
 
 
@@ -191,24 +197,29 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
             if(this.gamepad2.b) {
-                if (buttonIsReleased) {
-                    buttonIsReleased = false;
-                    if(!ClawBackwards) {
-                        SpinClaw.setPosition(ClawFowardPos);
-                        ClawBackwards = true;
-                    } else if(ClawBackwards) {
-                        SpinClaw.setPosition(ClawBackwardsPos);
-                        ClawBackwards = false;
+                boolean out = false; // Holds whether desired position has been reached
+                while(!out) {
+                    V4B_1.setPosition(V4B_1_TransferPos);
+                    V4B_2.setPosition(V4B_2_TransferPos);
+                    RotateClaw.setPosition(0.49);
+                    SpinClaw.setPosition(ClawBackwardsPos);
+
+                    IntakeLeft.setTargetPosition(-1100);
+                    IntakeRight.setTargetPosition(-1100);
+                    IntakeLeft.setPower(1);
+                    IntakeRight.setPower(1);
+
+                    if ((IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 < TransferPosition+10 && (IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 > TransferPosition-10) {
+                        out = true;
                     }
                 }
-            } else {
-                buttonIsReleased = true;
             }
 
 
             if(this.gamepad2.y) {
                 V4B_1.setPosition(V4B_1_HomePos);
                 V4B_2.setPosition(V4B_2_HomePos);
+                RotateClaw.setPosition(RotateClaw_HomePos);
             }
 
             IntakeLeft.setPower(1);
