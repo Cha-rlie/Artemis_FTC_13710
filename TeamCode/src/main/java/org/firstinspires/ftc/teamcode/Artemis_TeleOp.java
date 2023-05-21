@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
-import org.firstinspires.ftc.teamcode.Artemis_Functions;
+// import org.firstinspires.ftc.teamcode.Artemis_Functions;
 
 // Import the necessary FTC modules and classes
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Artemis_TeleOp extends LinearOpMode {
 
-    Artemis_Functions artemis_functions = new Artemis_Functions();
+    //Artemis_Functions artemis_functions = new Artemis_Functions();
 
     public void cycle(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, int IntakeOut) {
         IntakeLeft.setTargetPosition(IntakeOut);
@@ -108,8 +108,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // Initialise the input values from first controller for the drive base
             float xInput = (float)(this.gamepad1.right_stick_x*1.1); // Account for imperfect strafing
-            //float yInput = -this.gamepad1.right_stick_y; // One side needs to be reversed
-            float yInput = 1;
+            float yInput = -this.gamepad1.right_stick_y; // One side needs to be reversed
             float rInput = this.gamepad1.left_stick_x;
 
             // Initialise the input values from the second controller for the dual intake system
@@ -126,6 +125,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
 
             // Drive the drive base with mecanum code
+
             FrontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
             FrontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
             RearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
@@ -202,7 +202,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
 
-            if(this.gamepad2.b) {
+            if(this.gamepad2.left_trigger > 0.5) {
                 double TransferingRotation = 0.66+0.03;
 
                 boolean SlidePositionReached = false; // Holds whether desired position for intake slides has been reached
@@ -238,23 +238,15 @@ public class Artemis_TeleOp extends LinearOpMode {
                         V4BPositionReached = true;
                     }
                 }
-
-                sleep(5000);
-
                 while(!(Claw.getPosition() > 0.19) || !(Claw.getPosition() < 0.21)) { // Is the claw within the range of open?
                     Claw.setPosition(0.2);
                 }
 
                 // The claw has now dropped the cone, and successfully transferred i hope :')
-                // We can revert all the components to their intaking position
 
+            } else if (this.gamepad2.right_trigger > 0.5) {
                 V4B_1.setPosition(V4B_1_HomePos);
-                V4B_2.setPosition(V4B_1_HomePos);
-
-//                SpinClaw.setPosition(ClawFowardPos);
-//                RotateClaw.setPosition(RotateClaw_HomePos);
-
-
+                V4B_2.setPosition(V4B_2_HomePos);
             }
 
 
