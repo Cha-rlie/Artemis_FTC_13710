@@ -35,10 +35,10 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         double V4B_1_HomePos = 0.5994+0.04; // Position where V4B is ready for intaking
         double V4B_2_HomePos = 0.3627-0.04;
-        double V4B_1_TransferPos = 0.3177; // Position where V4B is ready for transfer
-        double V4B_2_TransferPos = 0.6388;
+        double V4B_1_TransferPos = 0.3077; // Position where V4B is ready for transfer
+        double V4B_2_TransferPos = 0.6483;
 
-        double RotateClaw_HomePos = 0.8; // Position where RotateClaw is ready for intaking
+        double RotateClaw_HomePos = 0.84; // Position where RotateClaw is ready for intaking
 
         double ClosedClawPos = 0.14; // Position where claw is closed
         double OpenClawPos = 0.31; // Position where claw is open
@@ -51,8 +51,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         double OpenPos = 0;
 
         int IntakeHome = 0; // Fully contracted position
-        int IntakeOut = -2000; // Fully extended position -2100
-        int TransferPosition = -1600;
+        int IntakeOut = -2000; // Fully extended position -2000
+        int TransferPosition = -1100;
 
 
         // Initialising the motors up for drive base
@@ -225,6 +225,7 @@ public class Artemis_TeleOp extends LinearOpMode {
                         // If the slides have reached the correct position...
                         SlidePositionReached = true;
                     }
+                    telemetry.addData("Reached? ", SlidePositionReached);
                 }
 
                 while(!V4BPositionReached) { // Once the slides are in position, wait to ensure the V4B is in position.
@@ -238,15 +239,34 @@ public class Artemis_TeleOp extends LinearOpMode {
                         V4BPositionReached = true;
                     }
                 }
+
                 while(!(Claw.getPosition() > 0.19) || !(Claw.getPosition() < 0.21)) { // Is the claw within the range of open?
                     Claw.setPosition(0.2);
+                    telemetry.addData("claw:", " have reached open pos");
                 }
 
                 // The claw has now dropped the cone, and successfully transferred i hope :')
 
             } else if (this.gamepad2.right_trigger > 0.5) {
-                V4B_1.setPosition(V4B_1_HomePos);
-                V4B_2.setPosition(V4B_2_HomePos);
+                boolean SlidePositionReached = false;
+
+                while(!SlidePositionReached) { // While the slides aren't in the correct position
+                    V4B_1.setPosition(V4B_1_HomePos);
+                    V4B_2.setPosition(V4B_2_HomePos);
+                    SpinClaw.setPosition(ClawFowardPos);
+                    RotateClaw.setPosition(RotateClaw_HomePos);
+
+                    IntakeLeft.setTargetPosition(IntakeOut);
+                    IntakeRight.setTargetPosition(IntakeOut);
+                    IntakeLeft.setPower(1);
+                    IntakeRight.setPower(1);
+
+                    if ((IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 < TransferPosition+10 && (IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 > TransferPosition-10) {
+                        // If the slides have reached the correct position...
+                        SlidePositionReached = true;
+                    }
+                }
+
             }
 
 
