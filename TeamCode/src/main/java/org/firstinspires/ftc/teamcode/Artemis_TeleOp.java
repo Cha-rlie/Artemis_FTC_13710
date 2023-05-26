@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Artemis_TeleOp extends LinearOpMode {
 
-  //  Artemis_Functions artemis_functions = new Artemis_Functions();
+    Artemis_Functions artemis_functions = new Artemis_Functions();
 
     @Override
     public void runOpMode() {
@@ -47,7 +47,7 @@ public class Artemis_TeleOp extends LinearOpMode {
         int IntakeHome = 0; // Fully contracted position
         int IntakeOut = -2000; // Fully extended position -2000
         int TransferPosition = -1100;
-        int DepositMax = 1000;
+        int DepositMax = 3500;
 
 
         // Initialising the motors up for drive base
@@ -198,7 +198,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
 
             if(this.gamepad2.left_trigger > 0.5) {
-                //artemis_functions.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
+                artemis_functions.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
 
             } else if (this.gamepad2.right_trigger > 0.5) {
                 boolean SlidePositionReached = false;
