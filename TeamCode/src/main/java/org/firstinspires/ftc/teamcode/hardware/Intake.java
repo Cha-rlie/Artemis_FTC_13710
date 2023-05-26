@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class Intake {
     private static Intake instance = null;
     public boolean enabled;
@@ -71,27 +73,33 @@ public class Intake {
     }
 
 
-    public void runIntake(RobotHardware robot, int targetPosition) {
+    public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry) {
         robot.IntakeLeft.setTargetPosition(targetPosition);
         robot.IntakeRight.setTargetPosition(targetPosition);
         robot.IntakeLeft.setPower(1);
         robot.IntakeRight.setPower(1);
         robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int avg = (robot.IntakeLeft.getCurrentPosition()+robot.IntakeRight.getCurrentPosition())/2;
+        telemetry.addData("Intake: ", avg);
     }
 
     // Method Overloading
-    public void runIntake(RobotHardware robot, int[] targetPosition) {
+    public void runIntake(RobotHardware robot, int[] targetPosition, Telemetry telemetry) {
         robot.IntakeLeft.setTargetPosition(targetPosition[0]);
         robot.IntakeRight.setTargetPosition(targetPosition[1]);
         robot.IntakeLeft.setPower(1);
         robot.IntakeRight.setPower(1);
         robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int avg = (robot.IntakeLeft.getCurrentPosition()+robot.IntakeRight.getCurrentPosition())/2;
+        telemetry.addData("Intake: ", avg);
     }
 
     public int[] getIntakePosition(RobotHardware robot) {
-        int[] positions = new int[1];
+        int[] positions = new int[2];
         positions[0] = robot.IntakeLeft.getCurrentPosition();
         positions[1] = robot.IntakeRight.getCurrentPosition();
 

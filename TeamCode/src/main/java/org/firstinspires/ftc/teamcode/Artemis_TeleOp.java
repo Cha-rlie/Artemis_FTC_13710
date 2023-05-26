@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
 import org.firstinspires.ftc.teamcode.hardware.Intake;
+import org.firstinspires.ftc.teamcode.hardware.Deposit;
 
 // Import the necessary FTC modules and classes
 //import com.google.android.libraries.play.games.inputmapping.Input;
@@ -18,17 +19,17 @@ public class Artemis_TeleOp extends LinearOpMode {
 
     private RobotHardware robot = RobotHardware.getInstance();
     private Intake intake = Intake.getInstance();
+    private Deposit deposit = Deposit.getInstance();
 
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
         intake.init(robot);
+        deposit.init(robot);
 
 
         boolean buttonIsReleased = true; // Handling debounce issues
 
-
-        int DepositMax = 3500;
 
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
@@ -51,30 +52,35 @@ public class Artemis_TeleOp extends LinearOpMode {
             robot.RearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
             robot.RearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
-            // MANUALLY move the deposit systems
-            if (this.gamepad2.dpad_up) {
-                robot.DepositLeft.setTargetPosition(DepositMax);
-                robot.DepositRight.setTargetPosition(DepositMax);
-            } else if (this.gamepad2.dpad_down) {
-                robot.DepositLeft.setTargetPosition(0);
-                robot.DepositRight.setTargetPosition(0);
-            } else {
-                robot.DepositLeft.setTargetPosition(robot.DepositLeft.getCurrentPosition());
-                robot.DepositRight.setTargetPosition(robot.DepositRight.getCurrentPosition());
+            // AUTOMATICALLY move the deposit systems
+            if(this.gamepad2.dpad_right) {
+                deposit.depositHigh(robot);
             }
 
+            // Two values are held:
+            // -
 
-            // Print out Encoder Values to the driver station
-            telemetry.addData("Deposit Left", robot.DepositLeft.getCurrentPosition());
-            telemetry.addData("Deposit Right", robot.DepositRight.getCurrentPosition());
-            telemetry.addData("Intake Left", robot.IntakeLeft.getCurrentPosition());
-            telemetry.addData("Intake Right", robot.IntakeRight.getCurrentPosition());
+            int avg = (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1])/2;
+            boolean withinRange = (deposit.AutomatedMovePosition < avg + deposit.encoderError) && (deposit.AutomatedMovePosition > avg - deposit.encoderError);
+            boolean withinRangeOfZero = (deposit.Min < avg + deposit.encoderError) && (deposit.Min > avg - deposit.encoderError);
 
+            if(deposit.AutomatedMove1 && withinRange) {
+                deposit.AutomatedMove2 = true;
+                if(deposit.AutomatedMove2 && withinRangeOfZero){
+                    deposit.AutomatedMove1 = false;
+                    deposit.AutomatedMove2 = false;
+                }
+            }
+
+            // MANUALLY move the deposit systems
+            if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.Max, telemetry);}
+            else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.Min, telemetry);}
+            else {deposit.runDeposit(robot, deposit.getDepositPosition(robot), telemetry);}
 
             // Intake Slides Manual Control
-            if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.IntakeHome);}
-            else if(gamepad2.left_stick_y < -0.5) {intake.runIntake(robot, intake.IntakeOut);}
-            else {intake.runIntake(robot, intake.getIntakePosition(robot));}
+            if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.IntakeHome, telemetry);}
+            else if(gamepad2.left_stick_y < -0.5) {intake.runIntake(robot, intake.IntakeOut, telemetry);}
+            else {intake.runIntake(robot, intake.getIntakePosition(robot), telemetry);}
 
             // Rotate Claw Manual Control
             if(gamepad2.left_bumper) {intake.rotateClaw(robot,0.01);}
