@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
-// import org.firstinspires.ftc.teamcode.Artemis_Functions;
+import org.firstinspires.ftc.teamcode.Intake;
 
 // Import the necessary FTC modules and classes
 //import com.google.android.libraries.play.games.inputmapping.Input;
@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -17,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Artemis_TeleOp extends LinearOpMode {
 
-    Artemis_Functions artemis_functions = new Artemis_Functions();
+    Intake intake = new Intake();
 
     @Override
     public void runOpMode() {
@@ -198,7 +197,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
 
             if(this.gamepad2.left_trigger > 0.5) {
-                artemis_functions.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
+                intake.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
 
             } else if (this.gamepad2.right_trigger > 0.5) {
                 boolean SlidePositionReached = false;

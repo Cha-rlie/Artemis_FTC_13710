@@ -1,22 +1,15 @@
-
 package org.firstinspires.ftc.teamcode;
 
-// Import the necessary custom-made classes
-
 // Import the necessary FTC modules and classes
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
-public class Artemis_Functions extends LinearOpMode{
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+
+public class Intake extends LinearOpMode {
 
     public void runOpMode() {
-
-    }
-
-    public Artemis_Functions() {
 
     }
 
@@ -100,4 +93,3 @@ public class Artemis_Functions extends LinearOpMode{
     }
 
 }
-
