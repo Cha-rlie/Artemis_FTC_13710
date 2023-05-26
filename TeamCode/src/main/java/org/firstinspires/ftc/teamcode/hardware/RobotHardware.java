@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 // Import the necessary custom-made classes
-import org.firstinspires.ftc.teamcode.Intake;
 
 // Import the necessary FTC modules and classes
 //import com.google.android.libraries.play.games.inputmapping.Input;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;

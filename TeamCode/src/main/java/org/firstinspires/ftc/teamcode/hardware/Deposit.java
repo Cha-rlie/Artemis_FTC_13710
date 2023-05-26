@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.hardware;
 
 // Import the necessary FTC modules and classes
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;

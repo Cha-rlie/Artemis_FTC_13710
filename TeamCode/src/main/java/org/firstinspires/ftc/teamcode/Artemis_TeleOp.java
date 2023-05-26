@@ -1,17 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
-import org.firstinspires.ftc.teamcode.Intake;
+import org.firstinspires.ftc.teamcode.hardware.Intake;
 
 // Import the necessary FTC modules and classes
 //import com.google.android.libraries.play.games.inputmapping.Input;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 
@@ -73,16 +70,11 @@ public class Artemis_TeleOp extends LinearOpMode {
             telemetry.addData("Intake Left", robot.IntakeLeft.getCurrentPosition());
             telemetry.addData("Intake Right", robot.IntakeRight.getCurrentPosition());
 
-//            if(gamepad2.left_stick_y > 0.5) {
-//                robot.IntakeLeft.setTargetPosition(IntakeHome);
-//                robot.IntakeRight.setTargetPosition(IntakeHome);
-//            } else if(gamepad2.left_stick_y < -0.5) {
-//                robot.IntakeLeft.setTargetPosition(IntakeOut);
-//                robot.IntakeRight.setTargetPosition(IntakeOut);
-//            } else {
-//                robot.IntakeLeft.setTargetPosition(robot.IntakeLeft.getCurrentPosition());
-//                robot.IntakeRight.setTargetPosition(robot.IntakeRight.getCurrentPosition());
-//            }
+
+            // Intake Slides Manual Control
+            if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.IntakeHome);}
+            else if(gamepad2.left_stick_y < -0.5) {intake.runIntake(robot, intake.IntakeOut);}
+            else {intake.runIntake(robot, intake.getIntakePosition(robot));}
 
             // Rotate Claw Manual Control
             if(gamepad2.left_bumper) {intake.rotateClaw(robot,0.01);}
@@ -143,11 +135,6 @@ public class Artemis_TeleOp extends LinearOpMode {
 //                robot.V4B_2.setPosition(V4B_2_HomePos);
 //                robot.RotateClaw.setPosition(RotateClaw_HomePos);
 //            }
-
-            robot.IntakeLeft.setPower(1);
-            robot.IntakeRight.setPower(1);
-            robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             robot.DepositLeft.setPower(1);
             robot.DepositRight.setPower(1);

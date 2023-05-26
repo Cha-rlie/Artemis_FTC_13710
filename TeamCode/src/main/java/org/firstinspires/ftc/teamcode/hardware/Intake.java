@@ -1,13 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.hardware;
 
 // Import the necessary FTC modules and classes
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 public class Intake {
     private static Intake instance = null;
@@ -35,9 +33,9 @@ public class Intake {
     double IntermediatePos = 0;
     double OpenPos = 0;
 
-    int IntakeHome = 0; // Fully contracted position
-    int IntakeOut = -2000; // Fully extended position -2000
-    int TransferPosition = -1100;
+    public int IntakeHome = 0; // Fully contracted position
+    public int IntakeOut = -2000; // Fully extended position -2000
+    public int TransferPosition = -1100;
 
     public static Intake getInstance() {
         if (instance == null) {
@@ -70,6 +68,34 @@ public class Intake {
                 ClawState = false;
             }
         }
+    }
+
+
+    public void runIntake(RobotHardware robot, int targetPosition) {
+        robot.IntakeLeft.setTargetPosition(targetPosition);
+        robot.IntakeRight.setTargetPosition(targetPosition);
+        robot.IntakeLeft.setPower(1);
+        robot.IntakeRight.setPower(1);
+        robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    // Method Overloading
+    public void runIntake(RobotHardware robot, int[] targetPosition) {
+        robot.IntakeLeft.setTargetPosition(targetPosition[0]);
+        robot.IntakeRight.setTargetPosition(targetPosition[1]);
+        robot.IntakeLeft.setPower(1);
+        robot.IntakeRight.setPower(1);
+        robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public int[] getIntakePosition(RobotHardware robot) {
+        int[] positions = new int[1];
+        positions[0] = robot.IntakeLeft.getCurrentPosition();
+        positions[1] = robot.IntakeRight.getCurrentPosition();
+
+        return positions;
     }
 
     public void coneTransfer(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, Servo V4B_1, Servo V4B_2, Servo Claw, Servo SpinClaw, Servo RotateClaw) {
