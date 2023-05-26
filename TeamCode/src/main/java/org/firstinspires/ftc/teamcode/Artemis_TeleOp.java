@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 // import org.firstinspires.ftc.teamcode.Artemis_Functions;
 
 // Import the necessary FTC modules and classes
+//import com.google.android.libraries.play.games.inputmapping.Input;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,14 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Artemis_TeleOp extends LinearOpMode {
 
-    //Artemis_Functions artemis_functions = new Artemis_Functions();
-
-    public void cycle(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, int IntakeOut) {
-        IntakeLeft.setTargetPosition(IntakeOut);
-        IntakeRight.setTargetPosition(IntakeOut);
-        IntakeLeft.setPower(1);
-        IntakeRight.setPower(1);
-    }
+  //  Artemis_Functions artemis_functions = new Artemis_Functions();
 
     @Override
     public void runOpMode() {
@@ -53,6 +47,7 @@ public class Artemis_TeleOp extends LinearOpMode {
         int IntakeHome = 0; // Fully contracted position
         int IntakeOut = -2000; // Fully extended position -2000
         int TransferPosition = -1100;
+        int DepositMax = 1000;
 
 
         // Initialising the motors up for drive base
@@ -75,6 +70,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         DcMotorEx DepositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
         DcMotorEx DepositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
         DepositRight.setDirection(DcMotorEx.Direction.REVERSE);
+        DepositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        DepositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         // Initialising the servos
@@ -85,13 +82,12 @@ public class Artemis_TeleOp extends LinearOpMode {
         Servo V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
         Servo Latch = hardwareMap.get(Servo.class, "Latch");
 
-        // Default Positions
+        // Starting/Default Positions
         V4B_1.setPosition(V4B_1_HomePos);
         V4B_2.setPosition(V4B_2_HomePos);
         RotateClaw.setPosition(RotateClaw_HomePos);
-        Claw.setPosition(OpenClawPos);
+        Claw.setPosition(ClosedClawPos);
        // SpinClaw.setPosition(ClawFowardPos);
-
         SpinClaw.setPosition(ClawFowardPos);
 
 
@@ -113,8 +109,6 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // Initialise the input values from the second controller for the dual intake system
             float V4BInput = this.gamepad2.right_stick_y;
-            boolean depositInputUp = this.gamepad2.dpad_up;
-            boolean depositInputDown = this.gamepad2.dpad_down;
             boolean mediumJunctionScore = this.gamepad2.dpad_left;
             boolean highJunctionScore = this.gamepad2.dpad_right;
             float LatchInput = this.gamepad1.right_stick_y;
@@ -132,16 +126,17 @@ public class Artemis_TeleOp extends LinearOpMode {
             RearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // MANUALLY move the intake and deposit systems
- /*
-            if (depositInputUp && depositInputDown) {}
-            else if (depositInputUp) {
-                DepositLeft.setPower(0.5);
-                DepositRight.setPower(0.5);
-            } else if (depositInputDown) {
-                DepositLeft.setPower(-0.5);
-                DepositRight.setPower(-0.5);
+            if (this.gamepad2.dpad_up) {
+                DepositLeft.setTargetPosition(DepositMax);
+                DepositRight.setTargetPosition(DepositMax);
+            } else if (this.gamepad2.dpad_down) {
+                DepositLeft.setTargetPosition(0);
+                DepositRight.setTargetPosition(0);
+            } else {
+                DepositLeft.setTargetPosition(DepositLeft.getCurrentPosition());
+                DepositRight.setTargetPosition(DepositRight.getCurrentPosition());
             }
-*/
+
 
             // Print out Encoder Values to the driver station
             telemetry.addData("Deposit Left", DepositLeft.getCurrentPosition());
@@ -203,49 +198,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
 
             if(this.gamepad2.left_trigger > 0.5) {
-                double TransferingRotation = 0.66+0.03;
-
-                boolean SlidePositionReached = false; // Holds whether desired position for intake slides has been reached
-                boolean V4BPositionReached = false; // Holds whether desired position for v4b has been reached
-
-                Claw.setPosition(ClosedClawPos);
-
-                while(!SlidePositionReached) { // While the slides aren't in the correct position
-                    V4B_1.setPosition(V4B_1_TransferPos);
-                    V4B_2.setPosition(V4B_2_TransferPos);
-                    SpinClaw.setPosition(ClawBackwardsPos);
-                    RotateClaw.setPosition(TransferingRotation);
-
-                    IntakeLeft.setTargetPosition(-700);
-                    IntakeRight.setTargetPosition(-700);
-                    IntakeLeft.setPower(1);
-                    IntakeRight.setPower(1);
-
-                    if ((IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 < TransferPosition+10 && (IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 > TransferPosition-10) {
-                        // If the slides have reached the correct position...
-                        SlidePositionReached = true;
-                    }
-                    telemetry.addData("Reached? ", SlidePositionReached);
-                }
-
-                while(!V4BPositionReached) { // Once the slides are in position, wait to ensure the V4B is in position.
-                    V4B_1.setPosition(V4B_1_TransferPos);
-                    V4B_2.setPosition(V4B_2_TransferPos);
-                    SpinClaw.setPosition(ClawBackwardsPos);
-                    RotateClaw.setPosition(TransferingRotation);
-
-                    if((V4B_1.getPosition() + V4B_2.getPosition())/2 < V4B_1_TransferPos+0.02 && (V4B_1.getPosition() + V4B_2.getPosition())/2 < V4B_1_TransferPos-0.02) {
-                        // If the v4b has reached the correct position...
-                        V4BPositionReached = true;
-                    }
-                }
-
-                while(!(Claw.getPosition() > 0.19) || !(Claw.getPosition() < 0.21)) { // Is the claw within the range of open?
-                    Claw.setPosition(0.2);
-                    telemetry.addData("claw:", " have reached open pos");
-                }
-
-                // The claw has now dropped the cone, and successfully transferred i hope :')
+                //artemis_functions.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
 
             } else if (this.gamepad2.right_trigger > 0.5) {
                 boolean SlidePositionReached = false;
@@ -279,7 +232,12 @@ public class Artemis_TeleOp extends LinearOpMode {
             IntakeLeft.setPower(1);
             IntakeRight.setPower(1);
             IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            DepositLeft.setPower(1);
+            DepositRight.setPower(1);
+            DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             V4B_1.setPosition(V4B_1.getPosition()+(V4BInput*2/200));
             V4B_2.setPosition(V4B_2.getPosition()-(V4BInput*2/200));
