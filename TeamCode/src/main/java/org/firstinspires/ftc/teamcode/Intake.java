@@ -7,10 +7,69 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Intake extends LinearOpMode {
+import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
-    public void runOpMode() {
+public class Intake {
+    private static Intake instance = null;
+    public boolean enabled;
 
+    boolean GroundIntake = false; // Is the Claw facing the ground?
+    boolean ClawBackwards = false; // Is the Claw facing backwards?
+    boolean ClawState = true; // True = open
+    public boolean AbuttonIsReleased = true;
+
+    double V4B_1_HomePos = 0.5994+0.04; // Position where V4B is ready for intaking
+    double V4B_2_HomePos = 0.3627-0.04;
+    double V4B_1_TransferPos = 0.3077; // Position where V4B is ready for transfer
+    double V4B_2_TransferPos = 0.6483;
+
+    double RotateClaw_HomePos = 0.84; // Position where RotateClaw is ready for intaking
+
+    double ClosedClawPos = 0.14; // Position where claw is closed
+    double OpenClawPos = 0.31; // Position where claw is open
+
+    double ClawFowardPos = 0.9;
+    double ClawBackwardsPos = 0.18;
+
+    double ClosedLatchPos = 0;
+    double IntermediatePos = 0;
+    double OpenPos = 0;
+
+    int IntakeHome = 0; // Fully contracted position
+    int IntakeOut = -2000; // Fully extended position -2000
+    int TransferPosition = -1100;
+
+    public static Intake getInstance() {
+        if (instance == null) {
+            instance = new Intake();
+        }
+        instance.enabled = true;
+        return instance;
+    }
+
+    public void init(RobotHardware robot) {
+        robot.V4B_1.setPosition(V4B_1_HomePos);
+        robot.V4B_2.setPosition(V4B_2_HomePos);
+        robot.RotateClaw.setPosition(RotateClaw_HomePos);
+        robot.Claw.setPosition(ClosedClawPos);
+        robot.SpinClaw.setPosition(ClawFowardPos);
+    }
+
+    public void rotateClaw(RobotHardware robot, double degrees) {
+        robot.RotateClaw.setPosition(robot.RotateClaw.getPosition() + degrees);
+    }
+
+    public void changeClaw(RobotHardware robot) {
+        if (AbuttonIsReleased) {
+            AbuttonIsReleased = false;
+            if(!ClawState) {
+                robot.Claw.setPosition(OpenClawPos);
+                ClawState = true;
+            } else if(ClawState) {
+                robot.Claw.setPosition(ClosedClawPos);
+                ClawState = false;
+            }
+        }
     }
 
     public void coneTransfer(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, Servo V4B_1, Servo V4B_2, Servo Claw, Servo SpinClaw, Servo RotateClaw) {
@@ -62,7 +121,6 @@ public class Intake extends LinearOpMode {
                 // If the slides have reached the correct position...
                 SlidePositionReached = true;
             }
-            telemetry.addData("Reached? ", SlidePositionReached);
         }
 
         while(!V4BPositionReached) { // Once the slides are in position, wait to ensure the V4B is in position.
@@ -79,7 +137,6 @@ public class Intake extends LinearOpMode {
 
         while(!(Claw.getPosition() > 0.19) || !(Claw.getPosition() < 0.21)) { // Is the claw within the range of open?
             Claw.setPosition(0.2);
-            telemetry.addData("claw:", " have reached open pos");
         }
 
         // The claw has now dropped the cone, and successfully transferred i hope :')
