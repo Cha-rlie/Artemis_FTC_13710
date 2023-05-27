@@ -107,32 +107,6 @@ public class Intake {
     }
 
     public void coneTransfer(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, Servo V4B_1, Servo V4B_2, Servo Claw, Servo SpinClaw, Servo RotateClaw) {
-        boolean GroundIntake = false; // Is the Claw facing the ground?
-        boolean ClawBackwards = false; // Is the Claw facing backwards?
-        boolean buttonIsReleased = true; // Handling debounce issues
-        boolean AbuttonIsReleased = true;
-        boolean ClawState = true; // True = open
-
-        double V4B_1_HomePos = 0.5994+0.04; // Position where V4B is ready for intaking
-        double V4B_2_HomePos = 0.3627-0.04;
-        double V4B_1_TransferPos = 0.3077; // Position where V4B is ready for transfer
-        double V4B_2_TransferPos = 0.6483;
-
-        double RotateClaw_HomePos = 0.84; // Position where RotateClaw is ready for intaking
-
-        double ClosedClawPos = 0.14; // Position where claw is closed
-        double OpenClawPos = 0.31; // Position where claw is open
-
-        double ClawFowardPos = 0.9;
-        double ClawBackwardsPos = 0.18;
-
-        double ClosedLatchPos = 0;
-        double IntermediatePos = 0;
-        double OpenPos = 0;
-
-        int IntakeHome = 0; // Fully contracted position
-        int IntakeOut = -2000; // Fully extended position -2000
-        int TransferPosition = -1100;
         double TransferingRotation = 0.66+0.03;
 
         boolean SlidePositionReached = false; // Holds whether desired position for intake slides has been reached

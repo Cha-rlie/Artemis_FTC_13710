@@ -30,7 +30,6 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         boolean buttonIsReleased = true; // Handling debounce issues
 
-
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
 
@@ -57,8 +56,6 @@ public class Artemis_TeleOp extends LinearOpMode {
                 deposit.depositHigh(robot);
             }
 
-            // Two values are held:
-            // -
 
             int avg = (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1])/2;
             boolean withinRange = (deposit.AutomatedMovePosition < avg + deposit.encoderError) && (deposit.AutomatedMovePosition > avg - deposit.encoderError);
@@ -91,7 +88,36 @@ public class Artemis_TeleOp extends LinearOpMode {
             else {intake.AbuttonIsReleased = true;}
 
 
-            // Handling debounce issues
+            robot.DepositLeft.setPower(1);
+            robot.DepositRight.setPower(1);
+            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+           // robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
+           // robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
+            telemetry.addData("V4B_1", robot.V4B_1.getPosition());
+            telemetry.addData("V4B_2", robot.V4B_2.getPosition());
+            telemetry.addData("RotateClaw", robot.RotateClaw.getPosition());
+            telemetry.addData("Claw", robot.Claw.getPosition());
+            telemetry.addData("SpinClaw", robot.SpinClaw.getPosition());
+            telemetry.addData("Latch", robot.Latch.getPosition());
+
+
+            telemetry.addData("Robot: ", robot.enabled);
+            // Update the telemetry's information screen
+            telemetry.update();
+
+        }
+
+    }
+
+}
+
+
+
+
+
+// Handling debounce issues
 //            if(this.gamepad2.x) {
 //                if (buttonIsReleased) {
 //                    buttonIsReleased = false;
@@ -141,28 +167,3 @@ public class Artemis_TeleOp extends LinearOpMode {
 //                robot.V4B_2.setPosition(V4B_2_HomePos);
 //                robot.RotateClaw.setPosition(RotateClaw_HomePos);
 //            }
-
-            robot.DepositLeft.setPower(1);
-            robot.DepositRight.setPower(1);
-            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
-            robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
-            telemetry.addData("V4B_1", robot.V4B_1.getPosition());
-            telemetry.addData("V4B_2", robot.V4B_2.getPosition());
-            telemetry.addData("RotateClaw", robot.RotateClaw.getPosition());
-            telemetry.addData("Claw", robot.Claw.getPosition());
-            telemetry.addData("SpinClaw", robot.SpinClaw.getPosition());
-            telemetry.addData("Latch", robot.Latch.getPosition());
-
-
-            telemetry.addData("Robot: ", robot.enabled);
-            // Update the telemetry's information screen
-            telemetry.update();
-
-        }
-
-    }
-
-}
