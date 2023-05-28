@@ -57,10 +57,6 @@ Contact us at artemis13710@gmail.com
 | A                | Opens and closes claw                                                                                     |
 | B                | Transfers cone onto deposit platform (Requires movement of both SpinClaw and V4B, and perhaps RotateClaw) | 
 | X                | Rotates claw 90 degrees (facing downwards), or reverts to vertical position for normal intaking           |
->>>>>>> 4946d791514605b27cdcd58186ade45e5cd37cb2
-
-
-
 
 ### Devices
 
@@ -91,7 +87,6 @@ Contact us at artemis13710@gmail.com
 | Pin | Device Name       | Function                  | How is it controlled? |
 |---|-------------|--------------------------------------| --------- |
 | 5 |Latch  | Hold cone while on deposit platform to prevent it from flying off   | Automatically controlled, linked to the movement of the deposit |
->>>>>>> 4946d791514605b27cdcd58186ade45e5cd37cb2
 
 
 \* Need to be coded immediately
