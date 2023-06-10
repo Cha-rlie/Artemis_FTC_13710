@@ -50,23 +50,23 @@ public class Intake {
     public void init(RobotHardware robot) {
         robot.V4B_1.setPosition(V4B_1_HomePos);
         robot.V4B_2.setPosition(V4B_2_HomePos);
-        robot.RotateClaw.setPosition(RotateClaw_HomePos);
-        robot.Claw.setPosition(ClosedClawPos);
-        robot.SpinClaw.setPosition(ClawFowardPos);
+        robot.rotateClaw.setPosition(RotateClaw_HomePos);
+        robot.claw.setPosition(ClosedClawPos);
+        robot.spinClaw.setPosition(ClawFowardPos);
     }
 
     public void rotateClaw(RobotHardware robot, double degrees) {
-        robot.RotateClaw.setPosition(robot.RotateClaw.getPosition() + degrees);
+        robot.rotateClaw.setPosition(robot.rotateClaw.getPosition() + degrees);
     }
 
     public void changeClaw(RobotHardware robot) {
         if (AbuttonIsReleased) {
             AbuttonIsReleased = false;
             if(!ClawState) {
-                robot.Claw.setPosition(OpenClawPos);
+                robot.claw.setPosition(OpenClawPos);
                 ClawState = true;
             } else if(ClawState) {
-                robot.Claw.setPosition(ClosedClawPos);
+                robot.claw.setPosition(ClosedClawPos);
                 ClawState = false;
             }
         }
@@ -74,34 +74,34 @@ public class Intake {
 
 
     public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry) {
-        robot.IntakeLeft.setTargetPosition(targetPosition);
-        robot.IntakeRight.setTargetPosition(targetPosition);
-        robot.IntakeLeft.setPower(1);
-        robot.IntakeRight.setPower(1);
-        robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.intakeLeft.setTargetPosition(targetPosition);
+        robot.intakeRight.setTargetPosition(targetPosition);
+        robot.intakeLeft.setPower(1);
+        robot.intakeRight.setPower(1);
+        robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        int avg = (robot.IntakeLeft.getCurrentPosition()+robot.IntakeRight.getCurrentPosition())/2;
+        int avg = (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2;
         telemetry.addData("Intake: ", avg);
     }
 
     // Method Overloading
     public void runIntake(RobotHardware robot, int[] targetPosition, Telemetry telemetry) {
-        robot.IntakeLeft.setTargetPosition(targetPosition[0]);
-        robot.IntakeRight.setTargetPosition(targetPosition[1]);
-        robot.IntakeLeft.setPower(1);
-        robot.IntakeRight.setPower(1);
-        robot.IntakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.IntakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.intakeLeft.setTargetPosition(targetPosition[0]);
+        robot.intakeRight.setTargetPosition(targetPosition[1]);
+        robot.intakeLeft.setPower(1);
+        robot.intakeRight.setPower(1);
+        robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        int avg = (robot.IntakeLeft.getCurrentPosition()+robot.IntakeRight.getCurrentPosition())/2;
+        int avg = (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2;
         telemetry.addData("Intake: ", avg);
     }
 
     public int[] getIntakePosition(RobotHardware robot) {
         int[] positions = new int[2];
-        positions[0] = robot.IntakeLeft.getCurrentPosition();
-        positions[1] = robot.IntakeRight.getCurrentPosition();
+        positions[0] = robot.intakeLeft.getCurrentPosition();
+        positions[1] = robot.intakeRight.getCurrentPosition();
 
         return positions;
     }

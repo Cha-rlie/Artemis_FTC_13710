@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.hardware.Deposit;
 //import com.google.android.libraries.play.games.inputmapping.Input;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
@@ -46,33 +45,34 @@ public class Artemis_TeleOp extends LinearOpMode {
 
 
             // Drive the drive base with mecanum code
-            robot.FrontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
-            robot.FrontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
-            robot.RearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
-            robot.RearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
+            robot.frontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
+            robot.frontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
+            robot.rearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
+            robot.rearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
 
             // AUTOMATICALLY move the deposit systems
             if(this.gamepad2.dpad_right) {
-                deposit.depositHigh(robot);
+                deposit.runDeposit(robot, 0, "High", telemetry);
+                //deposit.depositHigh(robot);
             }
 
 
             int avg = (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1])/2;
-            boolean withinRange = (deposit.AutomatedMovePosition < avg + deposit.encoderError) && (deposit.AutomatedMovePosition > avg - deposit.encoderError);
-            boolean withinRangeOfZero = (deposit.Min < avg + deposit.encoderError) && (deposit.Min > avg - deposit.encoderError);
+            boolean withinRange = (deposit.automatedMoveTargetPosition < avg + deposit.encoderError) && (deposit.automatedMoveTargetPosition > avg - deposit.encoderError);
+            boolean withinRangeOfZero = (deposit.min < avg + deposit.encoderError) && (deposit.min > avg - deposit.encoderError);
 
-            if(deposit.AutomatedMove1 && withinRange) {
+            /*if(deposit.AutomatedMove1 && withinRange) {
                 deposit.AutomatedMove2 = true;
                 if(deposit.AutomatedMove2 && withinRangeOfZero){
                     deposit.AutomatedMove1 = false;
                     deposit.AutomatedMove2 = false;
                 }
-            }
+            }*/
 
             // MANUALLY move the deposit systems
-            if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.Max, telemetry);}
-            else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.Min, telemetry);}
-            else {deposit.runDeposit(robot, deposit.getDepositPosition(robot), telemetry);}
+            if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
+            else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.min, "Manual", telemetry);}
+            else {deposit.runDeposit(robot, (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1]) / 2, "Manual", telemetry);}
 
             // Intake Slides Manual Control
             if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.IntakeHome, telemetry);}
@@ -166,4 +166,35 @@ public class Artemis_TeleOp extends LinearOpMode {
 //                robot.V4B_1.setPosition(V4B_1_HomePos);
 //                robot.V4B_2.setPosition(V4B_2_HomePos);
 //                robot.RotateClaw.setPosition(RotateClaw_HomePos);
+<<<<<<< HEAD
 //            }
+=======
+//            }
+
+            /*robot.DepositLeft.setPower(1);
+            robot.DepositRight.setPower(1);
+            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
+
+            deposit.runDeposit(robot,0, "Update", telemetry);
+
+            robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
+            robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
+            telemetry.addData("V4B_1", robot.V4B_1.getPosition());
+            telemetry.addData("V4B_2", robot.V4B_2.getPosition());
+            telemetry.addData("RotateClaw", robot.rotateClaw.getPosition());
+            telemetry.addData("Claw", robot.claw.getPosition());
+            telemetry.addData("SpinClaw", robot.spinClaw.getPosition());
+            telemetry.addData("Latch", robot.latch.getPosition());
+
+
+            telemetry.addData("Robot: ", robot.enabled);
+            // Update the telemetry's information screen
+            telemetry.update();
+
+        }
+
+    }
+
+}
+>>>>>>> e838f87b6d8914740b7b665bf8895a728210709f

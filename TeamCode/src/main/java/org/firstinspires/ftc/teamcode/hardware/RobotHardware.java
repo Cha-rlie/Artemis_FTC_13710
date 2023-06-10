@@ -11,22 +11,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class RobotHardware {
-    public DcMotorEx FrontLeft;
-    public DcMotorEx FrontRight;
-    public DcMotorEx RearLeft;
-    public DcMotorEx RearRight;
+    public DcMotorEx frontLeft;
+    public DcMotorEx frontRight;
+    public DcMotorEx rearLeft;
+    public DcMotorEx rearRight;
 
-    public DcMotorEx IntakeLeft;
-    public DcMotorEx IntakeRight;
-    public DcMotorEx DepositLeft;
-    public DcMotorEx DepositRight;
+    public DcMotorEx intakeLeft;
+    public DcMotorEx intakeRight;
+    public DcMotorEx depositLeft;
+    public DcMotorEx depositRight;
 
-    public Servo Claw;
-    public Servo RotateClaw;
-    public Servo SpinClaw;
+    public Servo claw;
+    public Servo rotateClaw;
+    public Servo spinClaw;
     public Servo V4B_1;
     public Servo V4B_2;
-    public Servo Latch;
+    public Servo latch;
 
     private static RobotHardware instance = null;
     public boolean enabled;
@@ -41,33 +41,33 @@ public class RobotHardware {
 
     public void init(HardwareMap hardwareMap) {
         // Initialising the motors up for drive base
-        FrontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
-        FrontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
-        RearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
-        RearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
+        frontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
+        frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
+        rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
+        rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
 
-        RearLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // Initialising the motors for the dual-intake system
-        IntakeLeft = hardwareMap.get(DcMotorEx.class, "IntakeLeft");
-        IntakeRight = hardwareMap.get(DcMotorEx.class, "IntakeRight");
-        IntakeRight.setDirection(DcMotorEx.Direction.REVERSE);
-        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeLeft = hardwareMap.get(DcMotorEx.class, "IntakeLeft");
+        intakeRight = hardwareMap.get(DcMotorEx.class, "IntakeRight");
+        intakeRight.setDirection(DcMotorEx.Direction.REVERSE);
+        intakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        DepositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
-        DepositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
-        DepositRight.setDirection(DcMotorEx.Direction.REVERSE);
-        DepositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        DepositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
+        depositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
+        depositRight.setDirection(DcMotorEx.Direction.REVERSE);
+        depositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Initialising the servos
-        Claw = hardwareMap.get(Servo.class, "Claw");
-        SpinClaw = hardwareMap.get(Servo.class,"SpinClaw");
-        RotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
+        claw = hardwareMap.get(Servo.class, "Claw");
+        spinClaw = hardwareMap.get(Servo.class,"SpinClaw");
+        rotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
         V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
         V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
-        Latch = hardwareMap.get(Servo.class, "Latch");
+        latch = hardwareMap.get(Servo.class, "Latch");
 
         this.enabled = true;
     }
