@@ -20,6 +20,7 @@ public class Deposit {
     int midJunction = 1000;
 
     public int automatedMoveTargetPosition;
+    public boolean automationWasSet;
 
     public static Deposit getInstance() {
         if (instance == null) {
@@ -46,20 +47,23 @@ public class Deposit {
             telemetry.addData("Deposit: ", avg);
         } else {
             if (mode == "High") {
-                automatedMoveTargetPosition = highJunction;} else if (mode == "Low") {
+                automatedMoveTargetPosition = highJunction;} else if (mode == "Medium") {
                 automatedMoveTargetPosition = midJunction;}
+            // Change the variable to demonstrate that an atomation command was just set
+            if (mode == "High" || mode == "Medium") {automationWasSet = true;}
 
             robot.depositLeft.setPower(1);
             robot.depositRight.setPower(1);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            if (Math.abs(robot.depositRight.getCurrentPosition() - automatedMoveTargetPosition) <= 10) {
+            if (automationWasSet == true && Math.abs(robot.depositRight.getCurrentPosition() - automatedMoveTargetPosition) <= 10) {
                 automatedMoveTargetPosition = min;
                 robot.depositLeft.setTargetPosition(automatedMoveTargetPosition);
                 robot.depositRight.setTargetPosition(automatedMoveTargetPosition);
                 robot.depositLeft.setPower(1);
                 robot.depositRight.setPower(1);
+                automationWasSet = false;
             }
 
         }

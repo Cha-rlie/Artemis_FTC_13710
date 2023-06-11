@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
+import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.Deposit;
 //import com.google.android.libraries.play.games.inputmapping.Input;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
@@ -17,12 +19,14 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 public class Artemis_TeleOp extends LinearOpMode {
 
     private RobotHardware robot = RobotHardware.getInstance();
+    private DriveTrain driveTrain = new DriveTrain();
     private Intake intake = Intake.getInstance();
     private Deposit deposit = Deposit.getInstance();
 
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
+        driveTrain.init(robot);
         intake.init(robot);
         deposit.init(robot);
 
@@ -34,7 +38,10 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
-            // Initialise the input values from first controller for the drive base
+
+            driveTrain.runDriveTrain(robot, telemetry, this.gamepad1);
+
+            /*// Initialise the input values from first controller for the drive base
             float xInput = (float)(this.gamepad1.right_stick_x*1.1); // Account for imperfect strafing
             float yInput = -this.gamepad1.right_stick_y; // One side needs to be reversed
             float rInput = this.gamepad1.left_stick_x;
@@ -48,7 +55,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             robot.frontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
             robot.frontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
             robot.rearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
-            robot.rearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
+            robot.rearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);*/
 
             // AUTOMATICALLY move the deposit systems
             if(this.gamepad2.dpad_right) {
@@ -75,8 +82,8 @@ public class Artemis_TeleOp extends LinearOpMode {
             else {deposit.runDeposit(robot, (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1]) / 2, "Manual", telemetry);}
 
             // Intake Slides Manual Control
-            if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.IntakeHome, telemetry);}
-            else if(gamepad2.left_stick_y < -0.5) {intake.runIntake(robot, intake.IntakeOut, telemetry);}
+            if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.intakeHome, telemetry);}
+            else if(gamepad2.left_stick_y < -0.5) {intake.runIntake(robot, intake.intakeOut, telemetry);}
             else {intake.runIntake(robot, intake.getIntakePosition(robot), telemetry);}
 
             // Rotate Claw Manual Control
@@ -85,96 +92,85 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // Open/Close Claw Manual Control
             if(this.gamepad2.a) {intake.changeClaw(robot);}
-            else {intake.AbuttonIsReleased = true;}
+            else {intake.buttonAReleased = true;}
 
 
-            robot.DepositLeft.setPower(1);
-            robot.DepositRight.setPower(1);
-            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositLeft.setPower(1);
+            robot.depositLeft.setPower(1);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
            // robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
            // robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
             telemetry.addData("V4B_1", robot.V4B_1.getPosition());
             telemetry.addData("V4B_2", robot.V4B_2.getPosition());
-            telemetry.addData("RotateClaw", robot.RotateClaw.getPosition());
-            telemetry.addData("Claw", robot.Claw.getPosition());
-            telemetry.addData("SpinClaw", robot.SpinClaw.getPosition());
-            telemetry.addData("Latch", robot.Latch.getPosition());
+            telemetry.addData("RotateClaw", robot.rotateClaw.getPosition());
+            telemetry.addData("Claw", robot.claw.getPosition());
+            telemetry.addData("SpinClaw", robot.spinClaw.getPosition());
+            telemetry.addData("Latch", robot.latch.getPosition());
 
 
             telemetry.addData("Robot: ", robot.enabled);
             // Update the telemetry's information screen
             telemetry.update();
 
-        }
 
-    }
-
-}
-
-
-
-
-
-// Handling debounce issues
-//            if(this.gamepad2.x) {
-//                if (buttonIsReleased) {
-//                    buttonIsReleased = false;
-//                    if(!GroundIntake) {
-//                        robot.RotateClaw.setPosition(0.78);
-//                        GroundIntake = true;
-//                    } else if(GroundIntake) {
-//                        robot.RotateClaw.setPosition(0.68);
-//                        GroundIntake = false;
-//                    }
-//                }
-//            } else {
-//                buttonIsReleased = true;
-//            }
+        // Handling debounce issues
+            if(this.gamepad2.x) {
+                if (buttonIsReleased) {
+                    buttonIsReleased = false;
+                    if(!intake.groundIntake) {
+                        robot.rotateClaw.setPosition(0.78);
+                        intake.groundIntake = true;
+                    } else if(intake.groundIntake) {
+                        robot.rotateClaw.setPosition(0.68);
+                        intake.groundIntake = false;
+                    }
+                }
+            } else {
+                buttonIsReleased = true;
+            }
 
 
-
-
-            /*
+            // Transfer the cone from the claw to the deposit "cone-holder"
             if(this.gamepad2.left_trigger > 0.5) {
-                intake.coneTransfer(IntakeLeft, IntakeRight, V4B_1, V4B_2, Claw, SpinClaw, RotateClaw);
+                intake.coneTransfer(robot);
 
-            } else if (this.gamepad2.right_trigger > 0.5) {
+            } /*else if (this.gamepad2.right_trigger > 0.5) {
                 boolean SlidePositionReached = false;
 
                 while(!SlidePositionReached) { // While the slides aren't in the correct position
-                    V4B_1.setPosition(V4B_1_HomePos);
-                    V4B_2.setPosition(V4B_2_HomePos);
-                    SpinClaw.setPosition(ClawFowardPos);
-                    RotateClaw.setPosition(RotateClaw_HomePos);
+                    robot.V4B_1.setPosition(V4B_1_HomePos);
+                    robot.V4B_2.setPosition(V4B_2_HomePos);
+                    robot.spinClaw.setPosition(ClawFowardPos);
+                    robot.rotateClaw.setPosition(RotateClaw_HomePos);
 
-                    IntakeLeft.setTargetPosition(IntakeOut);
-                    IntakeRight.setTargetPosition(IntakeOut);
-                    IntakeLeft.setPower(1);
-                    IntakeRight.setPower(1);
+                    robot.intakeLeft.setTargetPosition(IntakeOut);
+                    robot.intakeRight.setTargetPosition(IntakeOut);
+                    robot.intakeLeft.setPower(1);
+                    robot.intakeRight.setPower(1);
 
-                    if ((IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 < TransferPosition+10 && (IntakeLeft.getCurrentPosition()+IntakeRight.getCurrentPosition())/2 > TransferPosition-10) {
+                    if ((robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 < TransferPosition+10 && (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 > TransferPosition-10) {
                         // If the slides have reached the correct position...
                         SlidePositionReached = true;
                     }
                 }
-            }
-*/
+            }*/
+
 
 //            if(this.gamepad2.y) {
 //                robot.V4B_1.setPosition(V4B_1_HomePos);
 //                robot.V4B_2.setPosition(V4B_2_HomePos);
 //                robot.RotateClaw.setPosition(RotateClaw_HomePos);
-<<<<<<< HEAD
+//<<<<<<< HEAD
 //            }
-=======
+//=======
 //            }
 
-            /*robot.DepositLeft.setPower(1);
-            robot.DepositRight.setPower(1);
-            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
+            robot.depositLeft.setPower(1);
+            robot.depositRight.setPower(1);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             deposit.runDeposit(robot,0, "Update", telemetry);
 
@@ -197,4 +193,3 @@ public class Artemis_TeleOp extends LinearOpMode {
     }
 
 }
->>>>>>> e838f87b6d8914740b7b665bf8895a728210709f
