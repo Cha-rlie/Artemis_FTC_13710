@@ -79,7 +79,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             // MANUALLY move the deposit systems
             if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
             else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.min, "Manual", telemetry);}
-            else {deposit.runDeposit(robot, (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1]) / 2, "Manual", telemetry);}
+            else {deposit.runDeposit(robot, 0, "Update", telemetry);}
 
             // Intake Slides Manual Control
             if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.intakeHome, telemetry);}
@@ -172,7 +172,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            deposit.runDeposit(robot,0, "Update", telemetry);
+            //deposit.runDeposit(robot,0, "Update", telemetry);
 
             robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
             robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
