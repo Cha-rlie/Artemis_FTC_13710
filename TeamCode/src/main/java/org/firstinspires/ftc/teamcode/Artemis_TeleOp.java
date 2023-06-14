@@ -61,8 +61,9 @@ public class Artemis_TeleOp extends LinearOpMode {
             if(this.gamepad2.dpad_right) {
                 deposit.runDeposit(robot, 0, "High", telemetry);
                 //deposit.depositHigh(robot);
+            } else if (this.gamepad2.dpad_left) {
+                deposit.runDeposit(robot, 0, "Medium", telemetry);
             }
-
 
             int avg = (deposit.getDepositPosition(robot)[0] + deposit.getDepositPosition(robot)[1])/2;
             boolean withinRange = (deposit.automatedMoveTargetPosition < avg + deposit.encoderError) && (deposit.automatedMoveTargetPosition > avg - deposit.encoderError);
