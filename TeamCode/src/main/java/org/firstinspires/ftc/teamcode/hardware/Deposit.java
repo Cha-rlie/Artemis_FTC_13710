@@ -97,12 +97,26 @@ public class Deposit {
         }
     }
 
+    // Function that returns the average position of both deposits
     public int[] getDepositPosition(RobotHardware robot) {
         int[] positions = new int[2];
         positions[0] = robot.depositLeft.getCurrentPosition();
         positions[1] = robot.depositRight.getCurrentPosition();
 
         return positions;
+    }
+
+    // Function that controls the latch servo
+    public void controlLatch(RobotHardware robot, String mode, Telemetry telemetry) {
+        if (mode == "Open") {
+            robot.latch.setPosition(0);
+        }
+        else if (mode == "Prime") {
+            robot.latch.setPosition(1);
+        }
+        else if (mode == "Close") {
+            robot.latch.setPosition(1);
+        }
     }
 
     /*public void depositHigh(RobotHardware robot) {

@@ -36,6 +36,8 @@ public class Artemis_TeleOp extends LinearOpMode {
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
 
+        int latchPos = 0;
+
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
 
@@ -78,9 +80,9 @@ public class Artemis_TeleOp extends LinearOpMode {
             }*/
 
             // MANUALLY move the deposit systems
-            if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
+            /*if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
             else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.min, "Manual", telemetry);}
-            else {deposit.runDeposit(robot, 0, "Update", telemetry);}
+            else {deposit.runDeposit(robot, 0, "Update", telemetry);}*/
 
             // Intake Slides Manual Control
             if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.intakeHome, telemetry);}
@@ -136,7 +138,6 @@ public class Artemis_TeleOp extends LinearOpMode {
             // Transfer the cone from the claw to the deposit "cone-holder"
             if(this.gamepad2.left_trigger > 0.5) {
                 intake.coneTransfer(robot);
-
             } /*else if (this.gamepad2.right_trigger > 0.5) {
                 boolean SlidePositionReached = false;
 
@@ -167,6 +168,12 @@ public class Artemis_TeleOp extends LinearOpMode {
 //            }
 //=======
 //            }
+
+            if (this.gamepad2.dpad_up) {
+                deposit.controlLatch(robot, "Open", telemetry);
+            } else if (this.gamepad2.dpad_down) {
+                deposit.controlLatch(robot, "Close", telemetry);
+            }
 
             robot.depositLeft.setPower(1);
             robot.depositRight.setPower(1);
