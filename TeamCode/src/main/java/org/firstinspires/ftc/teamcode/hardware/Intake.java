@@ -35,7 +35,7 @@ public class Intake {
     double OpenPos = 0;
 
     public int intakeHome = 0; // Fully contracted position
-    public int intakeOut = -3400; // Fully extended position -2000
+    public int intakeOut = -3200 ; // Fully extended position -2000
     public int transferPosition = -1100;
 
     public static Intake getInstance() {

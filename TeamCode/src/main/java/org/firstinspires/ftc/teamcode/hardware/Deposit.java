@@ -47,8 +47,8 @@ public class Deposit {
 
             robot.depositLeft.setTargetPosition(targetPosition);
             robot.depositRight.setTargetPosition(targetPosition);
-            robot.depositLeft.setPower(1);
-            robot.depositRight.setPower(1);
+            robot.depositLeft.setPower(0.5);
+            robot.depositRight.setPower(0.5);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -88,8 +88,8 @@ public class Deposit {
             }
 
         } else if (!automationWasSet && !zeroWasTargetted){
-            robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)[0] + this.getDepositPosition(robot)[1]) / 2);
-            robot.depositRight.setTargetPosition((this.getDepositPosition(robot)[0] + this.getDepositPosition(robot)[1]) / 2);
+            robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)));
+            robot.depositRight.setTargetPosition((this.getDepositPosition(robot)));
             robot.depositLeft.setPower(1);
             robot.depositRight.setPower(1);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -98,12 +98,8 @@ public class Deposit {
     }
 
     // Function that returns the average position of both deposits
-    public int[] getDepositPosition(RobotHardware robot) {
-        int[] positions = new int[2];
-        positions[0] = robot.depositLeft.getCurrentPosition();
-        positions[1] = robot.depositRight.getCurrentPosition();
-
-        return positions;
+    public int getDepositPosition(RobotHardware robot) {
+        return (robot.depositLeft.getCurrentPosition()+robot.depositRight.getCurrentPosition())/2;
     }
 
     // Function that controls the latch servo
