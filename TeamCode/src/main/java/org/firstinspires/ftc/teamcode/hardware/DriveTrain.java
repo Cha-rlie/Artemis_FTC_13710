@@ -32,16 +32,30 @@ public class DriveTrain {
         float yInput = -gamepad1.right_stick_y; // One side needs to be reversed
         float rInput = gamepad1.left_stick_x;
 
+        boolean slowSpeed = gamepad1.left_bumper;
+        boolean fastSpeed = gamepad1.right_bumper;
+
+        // Variable to change the percentage the speed should be set at
+        double speedModifier;
+
+        // Change the speedModifier based off the bumpers pressed on the gamepad
+        if (slowSpeed && !fastSpeed) {
+            speedModifier = 0.4;
+        } else if (fastSpeed && !slowSpeed) {
+            speedModifier = 1;
+        } else {
+            speedModifier = 0.7;
+        }
 
         // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
         double ratioScalingDenominator = Math.max(Math.abs(yInput) + Math.abs(xInput) + Math.abs(rInput), 1);
 
 
         // Drive the drive base with mecanum code
-        robot.frontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
-        robot.frontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
-        robot.rearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
-        robot.rearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);
+        robot.frontLeft.setPower(((yInput + xInput + rInput) / ratioScalingDenominator)*speedModifier);
+        robot.frontRight.setPower(((yInput - xInput - rInput) / ratioScalingDenominator)*speedModifier);
+        robot.rearLeft.setPower(((yInput - xInput + rInput) / ratioScalingDenominator)*speedModifier);
+        robot.rearRight.setPower(((yInput + xInput - rInput) / ratioScalingDenominator)*speedModifier);
 
     }
 

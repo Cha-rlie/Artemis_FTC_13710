@@ -33,8 +33,6 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         boolean buttonIsReleased = true; // Handling debounce issues
 
-        robot.latch.setPosition(0);
-
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
 
@@ -69,6 +67,10 @@ public class Artemis_TeleOp extends LinearOpMode {
                 deposit.runDeposit(robot, 0, "Medium", telemetry);
             }
 
+            /*int avg = (deposit.getDepositPosition(robot));
+            boolean withinRange = (deposit.automatedMoveTargetPosition < avg + deposit.encoderError) && (deposit.automatedMoveTargetPosition > avg - deposit.encoderError);
+            boolean withinRangeOfZero = (deposit.min < avg + deposit.encoderError) && (deposit.min > avg - deposit.encoderError);*/
+
             /*if(deposit.AutomatedMove1 && withinRange) {
                 deposit.AutomatedMove2 = true;
                 if(deposit.AutomatedMove2 && withinRangeOfZero){
@@ -78,9 +80,9 @@ public class Artemis_TeleOp extends LinearOpMode {
             }*/
 
             // MANUALLY move the deposit systems
-            if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
+            /*if (this.gamepad2.dpad_up) {deposit.runDeposit(robot, deposit.max, "Manual", telemetry);}
             else if (this.gamepad2.dpad_down) {deposit.runDeposit(robot, deposit.min, "Manual", telemetry);}
-            else {deposit.runDeposit(robot, 0, "Update", telemetry);}
+            else {deposit.runDeposit(robot, 0, "Update", telemetry);}*/
 
             // Intake Slides Manual Control
             if(gamepad2.left_stick_y > 0.5) {intake.runIntake(robot, intake.intakeHome, telemetry);}
@@ -96,10 +98,10 @@ public class Artemis_TeleOp extends LinearOpMode {
             else {intake.buttonAReleased = true;}
 
 
-            robot.depositLeft.setPower(1);
+            /*robot.depositLeft.setPower(1);
             robot.depositLeft.setPower(1);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
 
            // robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y*2/200));
            // robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y*2/200));
@@ -168,15 +170,10 @@ public class Artemis_TeleOp extends LinearOpMode {
 //            }
 
             if (this.gamepad2.dpad_up) {
-                robot.latch.setPosition(1);
+                deposit.controlLatch(robot, "Open", telemetry);
             } else if (this.gamepad2.dpad_down) {
-                robot.latch.setPosition(0);
+                deposit.controlLatch(robot, "Close", telemetry);
             }
-
-            robot.depositLeft.setPower(1);
-            robot.depositRight.setPower(1);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             //deposit.runDeposit(robot,0, "Update", telemetry);
 
@@ -188,7 +185,6 @@ public class Artemis_TeleOp extends LinearOpMode {
             telemetry.addData("Claw", robot.claw.getPosition());
             telemetry.addData("SpinClaw", robot.spinClaw.getPosition());
             telemetry.addData("Latch", robot.latch.getPosition());
-            telemetry.addData("Deposit", deposit.getDepositPosition(robot));
 
 
             telemetry.addData("Robot: ", robot.enabled);

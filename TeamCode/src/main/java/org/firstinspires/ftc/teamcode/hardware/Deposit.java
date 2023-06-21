@@ -88,12 +88,17 @@ public class Deposit {
             }
 
         } else if (!automationWasSet && !zeroWasTargetted){
+
             robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)));
             robot.depositRight.setTargetPosition((this.getDepositPosition(robot)));
             robot.depositLeft.setPower(1);
             robot.depositRight.setPower(1);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            /*robot.depositLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.depositRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+
         }
     }
 

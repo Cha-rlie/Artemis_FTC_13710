@@ -25,8 +25,8 @@ Contact us at artemis13710@gmail.com
 | Left Stick X  | Turns robot                 |
 | Right Stick X | Strafes left or right       |
 | Right Stick Y | Drives forward or backwards |
-| Left Bumper   | Halves speed of robot       |
-| Right Bumper  | Doubles speed of robot      |
+| Left Bumper   | 40% driving speed           |
+| Right Bumper  | 100% driving speed          |
 
 #### Controller B
 | Control          | Function                                                                                                 |
