@@ -43,21 +43,6 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             driveTrain.runDriveTrain(robot, telemetry, this.gamepad1);
 
-            /*// Initialise the input values from first controller for the drive base
-            float xInput = (float)(this.gamepad1.right_stick_x*1.1); // Account for imperfect strafing
-            float yInput = -this.gamepad1.right_stick_y; // One side needs to be reversed
-            float rInput = this.gamepad1.left_stick_x;
-
-
-            // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
-            double ratioScalingDenominator = Math.max(Math.abs(yInput) + Math.abs(xInput) + Math.abs(rInput), 1);
-
-
-            // Drive the drive base with mecanum code
-            robot.frontLeft.setPower((yInput + xInput + rInput) / ratioScalingDenominator);
-            robot.frontRight.setPower((yInput - xInput - rInput) / ratioScalingDenominator);
-            robot.rearLeft.setPower((yInput - xInput + rInput) / ratioScalingDenominator);
-            robot.rearRight.setPower((yInput + xInput - rInput) / ratioScalingDenominator);*/
 
             // AUTOMATICALLY move the deposit systems
             if(this.gamepad2.dpad_right) {
@@ -67,17 +52,6 @@ public class Artemis_TeleOp extends LinearOpMode {
                 deposit.runDeposit(robot, 0, "Medium", telemetry);
             }
 
-            /*int avg = (deposit.getDepositPosition(robot));
-            boolean withinRange = (deposit.automatedMoveTargetPosition < avg + deposit.encoderError) && (deposit.automatedMoveTargetPosition > avg - deposit.encoderError);
-            boolean withinRangeOfZero = (deposit.min < avg + deposit.encoderError) && (deposit.min > avg - deposit.encoderError);*/
-
-            /*if(deposit.AutomatedMove1 && withinRange) {
-                deposit.AutomatedMove2 = true;
-                if(deposit.AutomatedMove2 && withinRangeOfZero){
-                    deposit.AutomatedMove1 = false;
-                    deposit.AutomatedMove2 = false;
-                }
-            }*/
 
             // MANUALLY move the deposit systems
             if (this.gamepad2.dpad_up) {
@@ -107,12 +81,6 @@ public class Artemis_TeleOp extends LinearOpMode {
             else {intake.buttonAReleased = true;}
 
 
-            /*robot.depositLeft.setPower(1);
-            robot.depositLeft.setPower(1);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
-
-
             telemetry.addData("Robot: ", robot.enabled);
             // Update the telemetry's information screen
             telemetry.update();
@@ -138,54 +106,18 @@ public class Artemis_TeleOp extends LinearOpMode {
             // Transfer the cone from the claw to the deposit "cone-holder"
             if(this.gamepad2.left_trigger > 0.5) {
                 intake.coneTransfer(robot);
-            } /*else if (this.gamepad2.right_trigger > 0.5) {
-                boolean SlidePositionReached = false;
-
-                while(!SlidePositionReached) { // While the slides aren't in the correct position
-                    robot.V4B_1.setPosition(V4B_1_HomePos);
-                    robot.V4B_2.setPosition(V4B_2_HomePos);
-                    robot.spinClaw.setPosition(ClawFowardPos);
-                    robot.rotateClaw.setPosition(RotateClaw_HomePos);
-
-                    robot.intakeLeft.setTargetPosition(IntakeOut);
-                    robot.intakeRight.setTargetPosition(IntakeOut);
-                    robot.intakeLeft.setPower(1);
-                    robot.intakeRight.setPower(1);
-
-                    if ((robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 < TransferPosition+10 && (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 > TransferPosition-10) {
-                        // If the slides have reached the correct position...
-                        SlidePositionReached = true;
-                    }
-                }
-            }*/
-
-
-//            if(this.gamepad2.y) {
-//                robot.V4B_1.setPosition(V4B_1_HomePos);
-//                robot.V4B_2.setPosition(V4B_2_HomePos);
-//                robot.RotateClaw.setPosition(RotateClaw_HomePos);
-//<<<<<<< HEAD
-//            }
-//=======
-//            }
-
-            /*if (this.gamepad2.x) {
-                deposit.controlLatch(robot, "Open", telemetry);
-            } else if (this.gamepad2.y) {
-                deposit.controlLatch(robot, "Close", telemetry);
-            }*/
-
-            //deposit.runDeposit(robot,0, "Update", telemetry);
-
+            }
             robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y/600));
             robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y/600));
-            telemetry.addData("V4B_1", robot.V4B_1.getPosition());
-            telemetry.addData("V4B_2", robot.V4B_2.getPosition());
-            telemetry.addData("RotateClaw", robot.rotateClaw.getPosition());
-            telemetry.addData("Claw", robot.claw.getPosition());
-            telemetry.addData("SpinClaw", robot.spinClaw.getPosition());
-            telemetry.addData("Latch", robot.latch.getPosition());
+            telemetry.addData("V4B_1: ", robot.V4B_1.getPosition());
+            telemetry.addData("V4B_2: ", robot.V4B_2.getPosition());
+            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
+            telemetry.addData("Claw: ", robot.claw.getPosition());
+            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
+            telemetry.addData("Latch: ", robot.latch.getPosition());
             telemetry.addData("Robot: ", robot.enabled);
+            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositLeft.getCurrentPosition()) / 2);
+
             // Update the telemetry's information screen
             telemetry.update();
 

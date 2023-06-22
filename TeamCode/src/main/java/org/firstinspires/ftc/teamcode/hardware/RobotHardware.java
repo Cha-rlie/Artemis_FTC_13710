@@ -71,8 +71,17 @@ public class RobotHardware {
         rotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
         V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
         V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
+        // V4B_2.setDirection(Servo.Direction.REVERSE);
         latch = hardwareMap.get(Servo.class, "Latch");
 
         this.enabled = true;
+    }
+
+    public boolean withinUncertainty(int currentPos, int wantedPos, int range) {
+        if((currentPos < wantedPos + range) && currentPos > wantedPos - range) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

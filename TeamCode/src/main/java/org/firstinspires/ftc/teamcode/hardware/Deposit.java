@@ -36,11 +36,6 @@ public class Deposit {
     }
 
     public void runDeposit(RobotHardware robot, int targetPosition, String mode, Telemetry telemetry) {
-        telemetry.addData("mode:", mode);
-        telemetry.addData("targetPosition:", targetPosition);
-        telemetry.addData("automatedmovetargetwas set", automatedMoveTargetPosition);
-        telemetry.addData("automaiton", automationWasSet);
-        telemetry.addData("zero", zeroWasTargetted);
         if (mode == "Manual") {
             // Stop the automation
             automationWasSet = false;
@@ -53,7 +48,7 @@ public class Deposit {
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             int avg = (robot.depositLeft.getCurrentPosition() + robot.depositLeft.getCurrentPosition()) / 2;
-            telemetry.addData("Deposit: ", avg);
+
         } else if (mode == "High" || mode == "Medium" || mode == "Low" || automationWasSet || zeroWasTargetted) {
             // Change the variable to demonstrate that an automation command was just set
             if (mode == "High" || mode == "Medium" || mode == "Low") {automationWasSet = true;}
@@ -89,13 +84,6 @@ public class Deposit {
 
         } else if (!automationWasSet && !zeroWasTargetted){
 
-            /*robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)));
-            robot.depositRight.setTargetPosition((this.getDepositPosition(robot)));
-            robot.depositLeft.setPower(1);
-            robot.depositRight.setPower(1);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
-
             robot.depositLeft.setPower(0);
             robot.depositRight.setPower(0);
 
@@ -119,38 +107,5 @@ public class Deposit {
             robot.latch.setPosition(1);
         }
     }
-
-    /*public void depositHigh(RobotHardware robot) {
-        AutomatedMove1 = true;
-        AutomatedMoveTargetPosition = HighJunction;
-        robot.DepositLeft.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositRight.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositLeft.setPower(1);
-        robot.DepositRight.setPower(1);
-
-        while(!(Math.abs(robot.DepositRight.getCurrentPosition() - HighJunction) <= 10)) {
-
-            robot.DepositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.DepositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
-
-        AutomatedMoveTargetPosition = Min;
-        robot.DepositLeft.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositRight.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositLeft.setPower(1);
-        robot.DepositRight.setPower(1);
-
-    }
-
-    public void depositMid(RobotHardware robot) {
-        AutomatedMove1 = true;
-        AutomatedMoveTargetPosition = MidJunction;
-        robot.DepositLeft.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositRight.setTargetPosition(AutomatedMoveTargetPosition);
-        robot.DepositLeft.setPower(1);
-        robot.DepositRight.setPower(1);
-    }*/
-
 
 }

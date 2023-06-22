@@ -18,6 +18,10 @@ public class Intake {
     public boolean buttonAReleased = true;
 
     double V4B_1_HomePos = 0.5994+0.04; // Position where V4B is ready for intaking
+
+    // ----------------- I DONT LIKE THE FACT THAT V4B1 AND V4B2 NEED DIFFERENT VALUES. I THINK WE CAN FIX THIS
+    // IN THE ROBOT HARDWARE CLASS IVE PUT SOME CODE THAT IVE COMMENT OUT WHICH REVERSES THE SERVO DIRECTION
+
     double V4B_2_HomePos = 0.3627-0.04;
     double V4B_1_TransferPos = 0.3077; // Position where V4B is ready for transfer
     double V4B_2_TransferPos = 0.6483;
