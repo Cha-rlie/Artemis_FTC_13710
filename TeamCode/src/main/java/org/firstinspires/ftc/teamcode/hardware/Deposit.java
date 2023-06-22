@@ -14,10 +14,10 @@ public class Deposit {
     public boolean enabled;
 
     public int encoderError = 5;
-    public int max = 3500;
+    public int max = 3000;
     public int min = 0;
-    int highJunction = 2000;
-    int midJunction = 1000;
+    int highJunction = 2200;
+    int midJunction = 1600;
 
     public int automatedMoveTargetPosition;
     public boolean automationWasSet;
@@ -47,8 +47,8 @@ public class Deposit {
 
             robot.depositLeft.setTargetPosition(targetPosition);
             robot.depositRight.setTargetPosition(targetPosition);
-            robot.depositLeft.setPower(0.5);
-            robot.depositRight.setPower(0.5);
+            robot.depositLeft.setPower(0.6);
+            robot.depositRight.setPower(0.6);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -89,15 +89,15 @@ public class Deposit {
 
         } else if (!automationWasSet && !zeroWasTargetted){
 
-            robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)));
+            /*robot.depositLeft.setTargetPosition((this.getDepositPosition(robot)));
             robot.depositRight.setTargetPosition((this.getDepositPosition(robot)));
             robot.depositLeft.setPower(1);
             robot.depositRight.setPower(1);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
 
-            /*robot.depositLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.depositRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+            robot.depositLeft.setPower(0);
+            robot.depositRight.setPower(0);
 
         }
     }

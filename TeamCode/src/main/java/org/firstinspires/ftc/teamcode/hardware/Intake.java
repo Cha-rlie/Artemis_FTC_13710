@@ -35,7 +35,7 @@ public class Intake {
     double OpenPos = 0;
 
     public int intakeHome = 0; // Fully contracted position
-    public int intakeOut = -3200 ; // Fully extended position -2000
+    public int intakeOut = -3000 ; // Fully extended position -2000
     public int transferPosition = -1100;
 
     public static Intake getInstance() {
@@ -50,7 +50,7 @@ public class Intake {
         robot.V4B_1.setPosition(V4B_1_HomePos);
         robot.V4B_2.setPosition(V4B_2_HomePos);
         robot.rotateClaw.setPosition(rotateClaw_HomePos);
-        robot.claw.setPosition(closedClawPos);
+        robot.claw.setPosition(openClawPos);
         robot.spinClaw.setPosition(clawFowardPos);
     }
 
@@ -84,18 +84,6 @@ public class Intake {
         telemetry.addData("Intake: ", avg);
     }
 
-    // Method Overloading for multiple positions
-    public void runIntake(RobotHardware robot, int[] targetPosition, Telemetry telemetry) {
-        robot.intakeLeft.setTargetPosition(targetPosition[0]);
-        robot.intakeRight.setTargetPosition(targetPosition[1]);
-        robot.intakeLeft.setPower(1);
-        robot.intakeRight.setPower(1);
-        robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int avg = (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2;
-        telemetry.addData("Intake: ", avg);
-    }
 
     public int[] getIntakePosition(RobotHardware robot) {
         int[] positions = new int[2];
@@ -119,12 +107,12 @@ public class Intake {
             robot.spinClaw.setPosition(clawBackwardsPos);
             robot.rotateClaw.setPosition(TransferingRotation);
 
-            robot.intakeLeft.setTargetPosition(-700);
-            robot.intakeRight.setTargetPosition(-700);
+            robot.intakeLeft.setTargetPosition(-550);
+            robot.intakeRight.setTargetPosition(-550);
             robot.intakeLeft.setPower(1);
             robot.intakeRight.setPower(1);
 
-            if ((robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 < transferPosition +10 && (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2 > transferPosition -10) {
+            if (robot.intakeLeft.getCurrentPosition() > -550-10 && robot.intakeLeft.getCurrentPosition() < -550+10) {
                 // If the slides have reached the correct position...
                 SlidePositionReached = true;
             }

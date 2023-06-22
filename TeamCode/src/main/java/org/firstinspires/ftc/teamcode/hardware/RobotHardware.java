@@ -54,12 +54,16 @@ public class RobotHardware {
         intakeRight.setDirection(DcMotorEx.Direction.REVERSE);
         intakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         depositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
         depositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");
         depositRight.setDirection(DcMotorEx.Direction.REVERSE);
         depositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         depositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        depositRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Initialising the servos
         claw = hardwareMap.get(Servo.class, "Claw");
