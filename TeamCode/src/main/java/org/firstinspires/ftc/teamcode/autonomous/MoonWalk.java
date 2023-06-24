@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 public class MoonWalk extends LinearOpMode {
 
+    // Create instances of all the custom-made hardware classes/objects
     private RobotHardware robot = RobotHardware.getInstance();
     private DriveTrain driveTrain = new DriveTrain();
     private Intake intake = Intake.getInstance();
@@ -22,10 +23,11 @@ public class MoonWalk extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Initialise all the custom-made hardware objects
         robot.init(hardwareMap);
         driveTrain.init(robot);
-        intake.init(robot);
-        deposit.init(robot);
+        intake.init(robot, telemetry);
+        deposit.init(robot, telemetry);
 
         robot.frontLeft.setPower(-0.7);
         robot.frontRight.setPower(-0.7);
