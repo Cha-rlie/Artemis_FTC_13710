@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
@@ -28,11 +29,11 @@ public class Artemis_TeleOp extends LinearOpMode {
     public void runOpMode() {
         robot.init(hardwareMap);
         driveTrain.init(robot);
-        intake.init(robot);
-        deposit.init(robot);
+        deposit.init(robot, telemetry);
+        intake.init(robot, telemetry);
 
         boolean buttonIsReleased = true; // Handling debounce issues
-        boolean movingToGround = false;
+
 
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
@@ -109,16 +110,12 @@ public class Artemis_TeleOp extends LinearOpMode {
             telemetry.addData("Cone Transferring? ", isConeBeingTransferred);
 
             if(this.gamepad2.y) {
-                robot.V4B_1.setPosition(intake.V4B_HomePos);
-                robot.V4B_2.setPosition(intake.V4B_HomePos);
-                robot.spinClaw.setPosition(intake.clawFowardPos);
-                movingToGround = true;
-                deposit.heldPosition = 0;
+                intake.resetToHome(robot, deposit);
             }
 
-            if(robot.V4B_1.getPosition() > intake.V4B_HomePos && movingToGround) {
+            if(robot.V4B_1.getPosition() > intake.V4B_HomePos && intake.movingToGround) {
                 robot.claw.setPosition(intake.openClawPos);
-                movingToGround = false;
+                intake.movingToGround = false;
             }
 
 
@@ -132,12 +129,13 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
             telemetry.addData("V4B: ", robot.V4B_1.getPosition());
-            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
-            telemetry.addData("Claw: ", robot.claw.getPosition());
-            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
-            telemetry.addData("Latch: ", robot.latch.getPosition());
-            telemetry.addData("Robot: ", robot.enabled);
+//            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
+//            telemetry.addData("Claw: ", robot.claw.getPosition());
+//            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
+//            telemetry.addData("Latch: ", robot.latch.getPosition());
+//            telemetry.addData("Robot: ", robot.enabled);
             telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
+            telemetry.addData("Deposit Current Draw", (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2);
 
             // Update the telemetry's information screen
             telemetry.update();

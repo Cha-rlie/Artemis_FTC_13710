@@ -24,8 +24,8 @@ public class MoonWalk extends LinearOpMode {
     public void runOpMode() {
         robot.init(hardwareMap);
         driveTrain.init(robot);
-        intake.init(robot);
-        deposit.init(robot);
+        deposit.init(robot, telemetry);
+        intake.init(robot, telemetry);
 
         robot.frontLeft.setPower(-0.7);
         robot.frontRight.setPower(-0.7);

@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.lang.Math;
 
@@ -32,8 +33,26 @@ public class Deposit {
         return instance;
     }
 
-    public void init(RobotHardware robot) {
+    public void init(RobotHardware robot, Telemetry telemetry) {
+        double current = 0;
         controlLatch(robot, "Close");
+
+        while(current <= 3) {
+            current = (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2;
+            robot.depositLeft.setPower(-0.5);
+            robot.depositRight.setPower(-0.5);
+            telemetry.addData("Current Draw: ", current);
+            telemetry.update();
+        }
+
+        telemetry.addData("Deposit Reset", "");
+        telemetry.update();
+
+        robot.depositLeft.setPower(0);
+        robot.depositRight.setPower(0);
+
+        robot.depositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.depositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void runDeposit(RobotHardware robot, int targetPosition, String mode, Telemetry telemetry) {
@@ -55,11 +74,10 @@ public class Deposit {
 
             // Set the desired automated values
             if (mode == "High") {
-                automatedMoveTargetPosition = highJunction;} else if (mode == "Medium") {
-                automatedMoveTargetPosition = midJunction;} else if (mode == "Low") {
-                automatedMoveTargetPosition = min;}
+                automatedMoveTargetPosition = highJunction; controlLatch(robot, "Close");} else if (mode == "Medium") {
+                automatedMoveTargetPosition = midJunction; controlLatch(robot, "Close");} else if (mode == "Low") {
+                automatedMoveTargetPosition = min; controlLatch(robot, "Close");controlLatch(robot, "Close");}
 
-            controlLatch(robot, "Close");
             robot.depositLeft.setTargetPosition(automatedMoveTargetPosition);
             robot.depositRight.setTargetPosition(automatedMoveTargetPosition);
             robot.depositLeft.setPower(1);

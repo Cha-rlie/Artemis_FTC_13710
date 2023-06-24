@@ -7,9 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Artemis_TeleOp;
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.util.concurrent.TimeUnit;
 
 public class Intake {
     private static Intake instance = null;
@@ -20,6 +24,7 @@ public class Intake {
     boolean clawBackwards = false; // Is the Claw facing backwards?
     boolean clawState = true; // True = open
     public boolean buttonAReleased = true;
+    public boolean movingToGround = false;
 
     // Transfer stoof
     public double V4B_HomePos = 0.580; // Position where V4B is ready for intaking
@@ -50,12 +55,34 @@ public class Intake {
         return instance;
     }
 
-    public void init(RobotHardware robot) {
+    public void init(RobotHardware robot, Telemetry telemetry) {
+        double current = 0;
+        int exceededCount = 0;
+
+        while(current <= 1) {
+            current = (robot.intakeLeft.getCurrent(CurrentUnit.AMPS)+robot.intakeRight.getCurrent(CurrentUnit.AMPS))/2;
+            robot.intakeLeft.setPower(0.2);
+            robot.intakeRight.setPower(0.2);
+            telemetry.addData("Current Draw: ", current);
+            telemetry.update();
+        }
+
+        robot.intakeLeft.setPower(0);
+        robot.intakeRight.setPower(0);
+
+        telemetry.addData("Intake Reset", "");
+        telemetry.update();
+
+        robot.intakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         robot.claw.setPosition(closedClawPos);
+
         mStateTime.reset();
         while(!(mStateTime.time() >= 1.0)) {
 
         }
+
         robot.rotateClaw.setPosition(rotateClaw_HomePos);
         robot.spinClaw.setPosition(clawFowardPos);
         robot.V4B_1.setPosition(V4B_HomePos);
@@ -74,6 +101,14 @@ public class Intake {
                 clawState = false;
             }
         }
+    }
+
+    public void resetToHome(RobotHardware robot, Deposit deposit) {
+        robot.V4B_1.setPosition(V4B_HomePos);
+        robot.V4B_2.setPosition(V4B_HomePos);
+        robot.spinClaw.setPosition(clawFowardPos);
+        movingToGround = true;
+        deposit.heldPosition = 0;
     }
 
     public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry) {
@@ -139,6 +174,8 @@ public class Intake {
 
         if (SlidePositionReached && V4BPositionReached && DepositReached) {
             deposit.controlLatch(robot,"Close");
+            robot.claw.setPosition(openClawPos);
+            resetToHome(robot, deposit);
             transferRunning = false;
             return false;
         } else {
