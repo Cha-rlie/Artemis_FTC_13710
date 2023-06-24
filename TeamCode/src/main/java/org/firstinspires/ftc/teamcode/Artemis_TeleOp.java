@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.hardware.Deposit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
@@ -30,17 +31,19 @@ public class Artemis_TeleOp extends LinearOpMode {
         intake.init(robot);
         deposit.init(robot);
 
-
         boolean buttonIsReleased = true; // Handling debounce issues
+        boolean movingToGround = false;
 
         // Wait for the driver to click the "Play" button before proceeding
         waitForStart();
 
         int latchPos = 0;
 
+        // Variable to keep track of whether or not a cone is being transferred
+        boolean isConeBeingTransferred = false;
+
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
-
             driveTrain.runDriveTrain(robot, telemetry, this.gamepad1);
 
 
@@ -68,55 +71,72 @@ public class Artemis_TeleOp extends LinearOpMode {
             } else if(gamepad2.left_stick_y < -0.5) {
                 intake.runIntake(robot, intake.intakeOut, telemetry);
             } else {
-                robot.intakeLeft.setPower(0);
-                robot.intakeRight.setPower(0);
+                if(!isConeBeingTransferred) {
+                    robot.intakeLeft.setPower(0);
+                    robot.intakeRight.setPower(0);
+                }
             }
-
-            // Rotate Claw Manual Control
-            if(gamepad2.left_bumper) {intake.rotateClaw(robot,0.01);}
-            else if (gamepad2.right_bumper) {intake.rotateClaw(robot,-0.01);}
 
             // Open/Close Claw Manual Control
             if(this.gamepad2.a) {intake.changeClaw(robot);}
             else {intake.buttonAReleased = true;}
-
 
             telemetry.addData("Robot: ", robot.enabled);
             // Update the telemetry's information screen
             telemetry.update();
 
 
-        // Handling debounce issues
-            if(this.gamepad2.x) {
-                if (buttonIsReleased) {
-                    buttonIsReleased = false;
-                    if(!intake.groundIntake) {
-                        robot.rotateClaw.setPosition(0.78);
-                        intake.groundIntake = true;
-                    } else if(intake.groundIntake) {
-                        robot.rotateClaw.setPosition(0.68);
-                        intake.groundIntake = false;
-                    }
-                }
-            } else {
-                buttonIsReleased = true;
-            }
+//            if(this.gamepad2.left_bumper) {
+//                robot.rotateClaw.setPosition(robot.rotateClaw.getPosition() + 0.005);
+//            }
+//            if(this.gamepad2.right_bumper) {
+//                robot.rotateClaw.setPosition(robot.rotateClaw.getPosition() - 0.005);
+//            }
 
+            intake.updateRotateClaw(robot);
 
             // Transfer the cone from the claw to the deposit "cone-holder"
             if(this.gamepad2.left_trigger > 0.5) {
-                intake.coneTransfer(robot);
+                isConeBeingTransferred = true;
+                intake.coneTransfer(robot,"Start", telemetry, deposit);
             }
-            robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(this.gamepad2.right_stick_y/600));
-            robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(this.gamepad2.right_stick_y/600));
-            telemetry.addData("V4B_1: ", robot.V4B_1.getPosition());
-            telemetry.addData("V4B_2: ", robot.V4B_2.getPosition());
+
+            if (isConeBeingTransferred) {
+                isConeBeingTransferred = intake.coneTransfer(robot, "Update", telemetry, deposit);
+            }
+
+            telemetry.addData("Have the slides reached position? ", intake.SlidePositionReached);
+            telemetry.addData("Cone Transferring? ", isConeBeingTransferred);
+
+            if(this.gamepad2.y) {
+                robot.V4B_1.setPosition(intake.V4B_HomePos-0.11);
+                robot.V4B_2.setPosition(intake.V4B_HomePos-0.11);
+                robot.spinClaw.setPosition(intake.clawFowardPos);
+                movingToGround = true;
+            }
+
+            if(robot.V4B_1.getPosition() > intake.V4B_HomePos && movingToGround) {
+                 robot.claw.setPosition(intake.openClawPos);
+                movingToGround = false;
+            }
+
+
+            if(this.gamepad2.right_stick_y < 0 && robot.V4B_1.getPosition() >= intake.V4B_TransferPos-0.01) {
+                robot.V4B_1.setPosition(robot.V4B_1.getPosition()-(Math.abs(this.gamepad2.right_stick_y/300)));
+                robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(Math.abs(this.gamepad2.right_stick_y/300)));
+
+            } else if (this.gamepad2.right_stick_y > 0 && robot.V4B_1.getPosition() <= intake.V4B_HomePos+0.01) {
+                robot.V4B_1.setPosition(robot.V4B_1.getPosition()+(Math.abs(this.gamepad2.right_stick_y/300)));
+                robot.V4B_2.setPosition(robot.V4B_2.getPosition()+(Math.abs(this.gamepad2.right_stick_y/300)));
+            }
+
+            telemetry.addData("V4B: ", robot.V4B_1.getPosition());
             telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
             telemetry.addData("Claw: ", robot.claw.getPosition());
             telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
             telemetry.addData("Latch: ", robot.latch.getPosition());
             telemetry.addData("Robot: ", robot.enabled);
-            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositLeft.getCurrentPosition()) / 2);
+            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
 
             // Update the telemetry's information screen
             telemetry.update();

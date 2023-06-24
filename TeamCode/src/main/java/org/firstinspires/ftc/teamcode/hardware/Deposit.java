@@ -16,8 +16,9 @@ public class Deposit {
     public int encoderError = 5;
     public int max = 3000;
     public int min = 0;
-    int highJunction = 2200;
-    int midJunction = 1600;
+    int highJunction = 2375;
+    int midJunction = 1420;
+    public int heldPosition = 0;
 
     public int automatedMoveTargetPosition;
     public boolean automationWasSet;
@@ -32,13 +33,14 @@ public class Deposit {
     }
 
     public void init(RobotHardware robot) {
-
+        controlLatch(robot, "Close");
     }
 
     public void runDeposit(RobotHardware robot, int targetPosition, String mode, Telemetry telemetry) {
         if (mode == "Manual") {
             // Stop the automation
             automationWasSet = false;
+            heldPosition = (robot.depositLeft.getCurrentPosition()+robot.depositRight.getCurrentPosition())/2 + 100;
 
             robot.depositLeft.setTargetPosition(targetPosition);
             robot.depositRight.setTargetPosition(targetPosition);
@@ -46,8 +48,6 @@ public class Deposit {
             robot.depositRight.setPower(0.6);
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            int avg = (robot.depositLeft.getCurrentPosition() + robot.depositLeft.getCurrentPosition()) / 2;
 
         } else if (mode == "High" || mode == "Medium" || mode == "Low" || automationWasSet || zeroWasTargetted) {
             // Change the variable to demonstrate that an automation command was just set
@@ -80,13 +80,16 @@ public class Deposit {
                 robot.depositRight.setPower(1);
                 robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                controlLatch(robot, "Open");
             }
 
         } else if (!automationWasSet && !zeroWasTargetted){
-
-            robot.depositLeft.setPower(0);
-            robot.depositRight.setPower(0);
-
+            robot.depositLeft.setTargetPosition(heldPosition);
+            robot.depositRight.setTargetPosition(heldPosition);
+            robot.depositLeft.setPower(1);
+            robot.depositRight.setPower(1);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
 
@@ -96,15 +99,15 @@ public class Deposit {
     }
 
     // Function that controls the latch servo
-    public void controlLatch(RobotHardware robot, String mode, Telemetry telemetry) {
+    public void controlLatch(RobotHardware robot, String mode) {
         if (mode == "Open") {
             robot.latch.setPosition(0);
         }
         else if (mode == "Prime") {
-            robot.latch.setPosition(1);
+            robot.latch.setPosition(0.53);
         }
         else if (mode == "Close") {
-            robot.latch.setPosition(1);
+            robot.latch.setPosition(0.6);
         }
     }
 

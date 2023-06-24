@@ -62,8 +62,8 @@ public class RobotHardware {
         depositRight.setDirection(DcMotorEx.Direction.REVERSE);
         depositLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         depositRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        depositLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        depositRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        depositLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        depositRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Initialising the servos
         claw = hardwareMap.get(Servo.class, "Claw");
@@ -71,13 +71,13 @@ public class RobotHardware {
         rotateClaw = hardwareMap.get(Servo.class, "RotateClaw");
         V4B_1 = hardwareMap.get(Servo.class, "V4B_1");
         V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
-        // V4B_2.setDirection(Servo.Direction.REVERSE);
+        V4B_2.setDirection(Servo.Direction.REVERSE);
         latch = hardwareMap.get(Servo.class, "Latch");
 
         this.enabled = true;
     }
 
-    public boolean withinUncertainty(int currentPos, int wantedPos, int range) {
+    public boolean withinUncertainty(double currentPos, double wantedPos, double range) {
         if((currentPos < wantedPos + range) && currentPos > wantedPos - range) {
             return true;
         } else {
