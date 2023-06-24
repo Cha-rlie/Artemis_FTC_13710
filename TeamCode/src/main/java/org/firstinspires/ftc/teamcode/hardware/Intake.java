@@ -21,17 +21,20 @@ public class Intake {
     boolean clawState = true; // True = open
     public boolean buttonAReleased = true;
 
-    public double V4B_HomePos = 0.6; // Position where V4B is ready for intaking
+    // Transfer stoof
+    public double V4B_HomePos = 0.580; // Position where V4B is ready for intaking
     public double V4B_TransferPos = 0.35; // Position where V4B is ready for transfer
     public double V4B_IdlePos = 0.38;
+    public int intakeTransferPos = -150;
+    public int depositTransferPos = 320;
 
     double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
 
     public double closedClawPos = 0.14; // Position where claw is closed
     public double openClawPos = 0.31; // Position where claw is open
 
-    public double clawFowardPos = 0.9;
-    public double clawBackwardsPos = 0.18;
+    public double clawFowardPos = 0.88;
+    public double clawBackwardsPos = 0.24;
 
 
     public int intakeHome = 0; // Fully contracted position
@@ -55,8 +58,8 @@ public class Intake {
         }
         robot.rotateClaw.setPosition(rotateClaw_HomePos);
         robot.spinClaw.setPosition(clawFowardPos);
-        robot.V4B_1.setPosition(V4B_IdlePos);
-        robot.V4B_2.setPosition(V4B_IdlePos);
+        robot.V4B_1.setPosition(V4B_HomePos);
+        robot.V4B_2.setPosition(V4B_HomePos);
     }
 
 
@@ -73,7 +76,6 @@ public class Intake {
         }
     }
 
-
     public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry) {
         robot.intakeLeft.setTargetPosition(targetPosition);
         robot.intakeRight.setTargetPosition(targetPosition);
@@ -87,10 +89,8 @@ public class Intake {
     }
 
     public void updateRotateClaw(RobotHardware robot) {
-        robot.rotateClaw.setPosition(0.495438 * robot.V4B_1.getPosition() + 0.539771);
+        robot.rotateClaw.setPosition(0.495438 * robot.V4B_1.getPosition() + 0.52);
     }
-
-
 
     boolean transferRunning = false;
 
@@ -100,8 +100,6 @@ public class Intake {
         boolean V4BPositionReached = false; // Holds whether desired position for v4b has been reached
         boolean DepositReached = false;
 
-        int intakeTransferPos = -170;
-        int depositTransferPos = 320;
 
         // Do things just once at the beginning
         if (mode == "Start" && !transferRunning) {
@@ -111,8 +109,7 @@ public class Intake {
         }
 
         if (!SlidePositionReached) {
-            deposit.heldPosition = 0;
-            deposit.controlLatch(robot, "Prime");
+            deposit.controlLatch(robot, "Open");
             robot.V4B_1.setPosition(V4B_TransferPos);
             robot.V4B_2.setPosition(V4B_TransferPos);
             robot.spinClaw.setPosition(clawBackwardsPos);
@@ -130,10 +127,9 @@ public class Intake {
             V4BPositionReached = true;
         }
 
-        if (SlidePositionReached && V4BPositionReached) {
-            deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
 
-            deposit.heldPosition = depositTransferPos;
+        if(SlidePositionReached && V4BPositionReached) {
+            deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
 
             if (robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), depositTransferPos, 10)) {
                 // If the v4b has reached the correct position...

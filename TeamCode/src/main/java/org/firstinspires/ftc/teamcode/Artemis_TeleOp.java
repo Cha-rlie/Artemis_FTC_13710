@@ -109,14 +109,15 @@ public class Artemis_TeleOp extends LinearOpMode {
             telemetry.addData("Cone Transferring? ", isConeBeingTransferred);
 
             if(this.gamepad2.y) {
-                robot.V4B_1.setPosition(intake.V4B_HomePos-0.11);
-                robot.V4B_2.setPosition(intake.V4B_HomePos-0.11);
+                robot.V4B_1.setPosition(intake.V4B_HomePos);
+                robot.V4B_2.setPosition(intake.V4B_HomePos);
                 robot.spinClaw.setPosition(intake.clawFowardPos);
                 movingToGround = true;
+                deposit.heldPosition = 0;
             }
 
             if(robot.V4B_1.getPosition() > intake.V4B_HomePos && movingToGround) {
-                 robot.claw.setPosition(intake.openClawPos);
+                robot.claw.setPosition(intake.openClawPos);
                 movingToGround = false;
             }
 
