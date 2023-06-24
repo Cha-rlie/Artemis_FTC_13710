@@ -117,7 +117,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
             if(robot.V4B_1.getPosition() > intake.V4B_HomePos && movingToGround) {
-                 robot.claw.setPosition(intake.openClawPos);
+                robot.claw.setPosition(intake.openClawPos);
                 movingToGround = false;
             }
 
