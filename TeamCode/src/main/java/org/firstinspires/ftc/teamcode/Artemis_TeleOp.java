@@ -67,24 +67,20 @@ public class Artemis_TeleOp extends LinearOpMode {
             }
 
             // Intake Slides Manual Control
-            if(gamepad2.left_stick_y > 0.5) {
-                intake.runIntake(robot, intake.intakeHome, telemetry);
-            } else if(gamepad2.left_stick_y < -0.5) {
-                intake.runIntake(robot, intake.intakeOut, telemetry);
+            if (!isConeBeingTransferred && gamepad2.left_stick_y < 0.1) {
+                intake.runIntake(robot, intake.intakeOut, telemetry, gamepad2.left_stick_y);
+            } else if (!isConeBeingTransferred && gamepad2.left_stick_y > -0.1) {
+                intake.runIntake(robot, intake.intakeHome, telemetry, gamepad2.left_stick_y);
             } else {
-                if(!isConeBeingTransferred) {
-                    robot.intakeLeft.setPower(0);
-                    robot.intakeRight.setPower(0);
-                }
+                robot.intakeLeft.setPower(0);
+                robot.intakeRight.setPower(0);
             }
+
 
             // Open/Close Claw Manual Control
             if(this.gamepad2.a) {intake.changeClaw(robot);}
             else {intake.buttonAReleased = true;}
 
-            telemetry.addData("Robot: ", robot.enabled);
-            // Update the telemetry's information screen
-            telemetry.update();
 
 
 //            if(this.gamepad2.left_bumper) {
@@ -128,14 +124,19 @@ public class Artemis_TeleOp extends LinearOpMode {
                 robot.V4B_2.setPosition(robot.V4B_2.getPosition()+(Math.abs(this.gamepad2.right_stick_y/300)));
             }
 
+            if(gamepad2.x) {
+                deposit.controlLatch(robot, "Open");
+            }
+
             telemetry.addData("V4B: ", robot.V4B_1.getPosition());
 //            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
 //            telemetry.addData("Claw: ", robot.claw.getPosition());
 //            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
-//            telemetry.addData("Latch: ", robot.latch.getPosition());
+            telemetry.addData("Latch: ", robot.latch.getPosition());
+            telemetry.addData("Latch mode: ", deposit.latchMode(robot));
 //            telemetry.addData("Robot: ", robot.enabled);
-            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
-            telemetry.addData("Deposit Current Draw", (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2);
+//            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
+//            telemetry.addData("Deposit Current Draw", (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2);
 
             // Update the telemetry's information screen
             telemetry.update();

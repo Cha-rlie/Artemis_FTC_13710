@@ -83,10 +83,10 @@ public class Intake {
 
         }
 
-        robot.rotateClaw.setPosition(rotateClaw_HomePos);
+        updateRotateClaw(robot);
         robot.spinClaw.setPosition(clawFowardPos);
-        robot.V4B_1.setPosition(V4B_HomePos);
-        robot.V4B_2.setPosition(V4B_HomePos);
+        robot.V4B_1.setPosition(V4B_TransferPos);
+        robot.V4B_2.setPosition(V4B_TransferPos);
     }
 
 
@@ -111,16 +111,13 @@ public class Intake {
         deposit.heldPosition = 0;
     }
 
-    public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry) {
+    public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry, double power) {
         robot.intakeLeft.setTargetPosition(targetPosition);
         robot.intakeRight.setTargetPosition(targetPosition);
-        robot.intakeLeft.setPower(1);
-        robot.intakeRight.setPower(1);
+        robot.intakeLeft.setPower(power);
+        robot.intakeRight.setPower(power);
         robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int avg = (robot.intakeLeft.getCurrentPosition()+robot.intakeRight.getCurrentPosition())/2;
-        telemetry.addData("Intake: ", avg);
     }
 
     public void updateRotateClaw(RobotHardware robot) {
@@ -144,12 +141,12 @@ public class Intake {
         }
 
         if (!SlidePositionReached) {
-            deposit.controlLatch(robot, "Open");
+            deposit.controlLatch(robot, "Prime");
             robot.V4B_1.setPosition(V4B_TransferPos);
             robot.V4B_2.setPosition(V4B_TransferPos);
             robot.spinClaw.setPosition(clawBackwardsPos);
 
-            runIntake(robot, intakeTransferPos, telemetry);
+            runIntake(robot, intakeTransferPos, telemetry, 1);
 
             if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeTransferPos, 10)) {
                 // If the slides have reached the correct position...
@@ -173,8 +170,13 @@ public class Intake {
         }
 
         if (SlidePositionReached && V4BPositionReached && DepositReached) {
-            deposit.controlLatch(robot,"Close");
-            robot.claw.setPosition(openClawPos);
+            deposit.controlLatch(robot, "Close");
+            robot.claw.setPosition(openClawPos - 0.08);
+        }
+
+
+
+        if(SlidePositionReached && V4BPositionReached && DepositReached && deposit.latchMode(robot) == "Close") {
             resetToHome(robot, deposit);
             transferRunning = false;
             return false;

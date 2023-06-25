@@ -52,6 +52,8 @@ public class RobotHardware {
         intakeLeft = hardwareMap.get(DcMotorEx.class, "IntakeLeft");
         intakeRight = hardwareMap.get(DcMotorEx.class, "IntakeRight");
         intakeRight.setDirection(DcMotorEx.Direction.REVERSE);
+        intakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         depositLeft = hardwareMap.get(DcMotorEx.class, "DepositLeft");
         depositRight = hardwareMap.get(DcMotorEx.class, "DepositRight");

@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -20,6 +21,10 @@ public class Deposit {
     public int min = 0;
     int highJunction = 2375;
     int midJunction = 1420;
+
+    double latchOpen = 0.1;
+    double latchPrime = 0.4;
+    double latchClose = 0.65;
 
     public int automatedMoveTargetPosition;
     public boolean automationWasSet;
@@ -120,13 +125,25 @@ public class Deposit {
     // Function that controls the latch servo
     public void controlLatch(RobotHardware robot, String mode) {
         if (mode == "Open") {
-            robot.latch.setPosition(0);
+            robot.latch.setPosition(latchOpen);
         }
         else if (mode == "Prime") {
-            robot.latch.setPosition(0.4);
+            robot.latch.setPosition(latchPrime);
         }
         else if (mode == "Close") {
-            robot.latch.setPosition(0.65);
+            robot.latch.setPosition(latchClose);
+        }
+    }
+
+    public String latchMode(RobotHardware robot) {
+        if(robot.withinUncertainty(robot.latch.getPosition(), latchOpen, 0.01)) {
+            return("Open");
+        } else if(robot.withinUncertainty(robot.latch.getPosition(), latchPrime, 0.01)) {
+            return("Prime");
+        } else if (robot.withinUncertainty(robot.latch.getPosition(), latchClose, 0.01)) {
+            return("Close");
+        } else {
+            return("Unknown");
         }
     }
 
