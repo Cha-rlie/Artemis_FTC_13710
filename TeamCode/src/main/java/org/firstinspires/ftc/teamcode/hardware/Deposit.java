@@ -15,6 +15,8 @@ public class Deposit {
     private static Deposit instance = null;
     public boolean enabled;
     public int heldPosition = 0;
+    public boolean buttonReleased = true;
+    boolean latchState = false; // True = open
 
     public int encoderError = 5;
     public int max = 3000;
@@ -23,7 +25,7 @@ public class Deposit {
     int midJunction = 1420;
 
     double latchOpen = 0.1;
-    double latchPrime = 0.4;
+    double latchPrime = 0.5;
     double latchClose = 0.65;
 
     public int automatedMoveTargetPosition;
@@ -90,10 +92,10 @@ public class Deposit {
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            if (zeroWasTargetted == true && Math.abs(robot.depositRight.getCurrentPosition()) <= 5) {
+            if (zeroWasTargetted == true && robot.withinUncertainty(robot.depositRight.getCurrentPosition(), min, 10)) {
                 zeroWasTargetted = false;
 
-            } else if (automationWasSet == true && Math.abs(robot.depositRight.getCurrentPosition() - automatedMoveTargetPosition) <= 10) {
+            } else if (automationWasSet == true && robot.withinUncertainty(robot.depositRight.getCurrentPosition(), automatedMoveTargetPosition, 10)) {
                 //this.runDeposit(robot, min, "Low", telemetry);
                 zeroWasTargetted = true;
                 automationWasSet = false;
@@ -104,7 +106,7 @@ public class Deposit {
                 robot.depositRight.setPower(1);
                 robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                controlLatch(robot, "Open");
+                controlLatch(robot, "Prime");
             }
 
         } else if (!automationWasSet && !zeroWasTargetted){
@@ -147,4 +149,16 @@ public class Deposit {
         }
     }
 
+    public void changeLatch(RobotHardware robot) {
+        if (buttonReleased) {
+            buttonReleased = false;
+            if(!latchState) {
+                robot.latch.setPosition(latchPrime);
+                latchState = true;
+            } else if(latchState) {
+                robot.latch.setPosition(latchClose);
+                latchState = false;
+            }
+        }
+    }
 }

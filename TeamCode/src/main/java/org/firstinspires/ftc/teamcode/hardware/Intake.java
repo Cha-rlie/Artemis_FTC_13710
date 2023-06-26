@@ -22,8 +22,9 @@ public class Intake {
 
     public boolean groundIntake = false; // Is the Claw facing the ground?
     boolean clawBackwards = false; // Is the Claw facing backwards?
-    boolean clawState = true; // True = open
+    public boolean clawState = true; // True = open
     public boolean buttonAReleased = true;
+    public boolean buttonXReleased = true;
     public boolean movingToGround = false;
 
     // Transfer stoof
@@ -34,13 +35,13 @@ public class Intake {
     public int depositTransferPos = 320;
 
     double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
+    double rotateClaw_Ground = 0.5; // Position where RotateClaw is ready for ground intaking
 
-    public double closedClawPos = 0.14; // Position where claw is closed
-    public double openClawPos = 0.31; // Position where claw is open
+    public double closedClawPos = 0; // Position where claw is closed
+    public double openClawPos = 0.3; // Position where claw is open
 
-    public double clawFowardPos = 0.88;
-    public double clawBackwardsPos = 0.24;
-
+    public double clawFowardPos = 0.709;
+    public double clawBackwardsPos = 0.050;
 
     public int intakeHome = 0; // Fully contracted position
     public int intakeOut = -3000 ; // Fully extended position -2000
@@ -83,10 +84,10 @@ public class Intake {
 
         }
 
-        updateRotateClaw(robot);
+        updateRotateClaw(robot, 0);
         robot.spinClaw.setPosition(clawFowardPos);
-        robot.V4B_1.setPosition(V4B_TransferPos);
-        robot.V4B_2.setPosition(V4B_TransferPos);
+        robot.V4B_1.setPosition(V4B_HomePos);
+        robot.V4B_2.setPosition(V4B_HomePos);
     }
 
 
@@ -99,6 +100,19 @@ public class Intake {
             } else if(clawState) {
                 robot.claw.setPosition(closedClawPos);
                 clawState = false;
+            }
+        }
+    }
+
+    public void GroundIntake(RobotHardware robot) {
+        if (buttonXReleased) {
+            buttonXReleased = false;
+            if(!groundIntake) {
+                robot.rotateClaw.setPosition(rotateClaw_Ground);
+                groundIntake = true;
+            } else if(groundIntake) {
+                robot.rotateClaw.setPosition(rotateClaw_HomePos);
+                groundIntake = false;
             }
         }
     }
@@ -120,8 +134,10 @@ public class Intake {
         robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void updateRotateClaw(RobotHardware robot) {
-        robot.rotateClaw.setPosition(0.495438 * robot.V4B_1.getPosition() + 0.52);
+    public void updateRotateClaw(RobotHardware robot, double increment) {
+        double gradient = 0.495438;
+        double cintercept = 0.52 + 0.005 + increment;
+        robot.rotateClaw.setPosition(gradient * robot.V4B_1.getPosition() + cintercept);
     }
 
     boolean transferRunning = false;

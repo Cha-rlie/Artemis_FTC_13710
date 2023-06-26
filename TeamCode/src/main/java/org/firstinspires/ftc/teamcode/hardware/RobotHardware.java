@@ -6,8 +6,13 @@ package org.firstinspires.ftc.teamcode.hardware;
 //import com.google.android.libraries.play.games.inputmapping.Input;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 
 public class RobotHardware {
@@ -28,6 +33,9 @@ public class RobotHardware {
     public Servo V4B_2;
     public Servo latch;
 
+    public DistanceSensor clawDistance;
+
+
     private static RobotHardware instance = null;
     public boolean enabled;
 
@@ -45,7 +53,6 @@ public class RobotHardware {
         frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
         rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
         rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
-
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // Initialising the motors for the dual-intake system
@@ -69,6 +76,8 @@ public class RobotHardware {
         V4B_2 = hardwareMap.get(Servo.class, "V4B_2");
         V4B_2.setDirection(Servo.Direction.REVERSE);
         latch = hardwareMap.get(Servo.class, "Latch");
+
+        clawDistance = hardwareMap.get(DistanceSensor.class, "clawDistance");
 
         this.enabled = true;
     }

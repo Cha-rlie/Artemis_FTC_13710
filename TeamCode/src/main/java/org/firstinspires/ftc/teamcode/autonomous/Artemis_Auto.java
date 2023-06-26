@@ -1,32 +1,46 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-// Import the necessary custom-made classes
-
+// Import the classes necessary to run RoadRunner
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-//import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RoadRunnerStoof.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.RoadRunnerStoof.trajectorysequence.TrajectorySequence;
+
+// Import the custom-made hardware classes
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+
+// Import the custom-class to detect the cone sleeve side
+import org.firstinspires.ftc.teamcode.autonomous.sleeveDetection.Artemis_AprilTag_Autonomous;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 
 @Autonomous
 
 public class Artemis_Auto extends LinearOpMode {
 
-    // Create instances of all the custom-made hardware classes/objects
+    // Initialise instances of all the custom-made hardware classes/objects
     private RobotHardware robot = RobotHardware.getInstance();
     private DriveTrain driveTrain = new DriveTrain();
     private Intake intake = Intake.getInstance();
     private Deposit deposit = Deposit.getInstance();
+
+    // Set-up the camera view
+    public int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+    public OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
+
+    // Initialise the instance of the class to detect the cone sleeve's side
+    private Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
+
+    // Get the desired parking location
+    String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
 
     @Override
     public void runOpMode() {
@@ -50,6 +64,8 @@ public class Artemis_Auto extends LinearOpMode {
         waitForStart();
 
         drive.followTrajectory(ArtemisAutoTesting);
+
+        telemetry.addData("Place to park", parkingLocation);
 
         if(isStopRequested()) return;
 
@@ -91,7 +107,6 @@ public class Artemis_Auto extends LinearOpMode {
 //        }
 
         // Run until the "Stop" button is pressed
-
 
 
     }

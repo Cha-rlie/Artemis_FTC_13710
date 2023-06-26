@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 // Import the necessary custom-made classes
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
@@ -39,6 +40,7 @@ public class Artemis_TeleOp extends LinearOpMode {
         waitForStart();
 
         int latchPos = 0;
+        double increment = 0;
 
         // Variable to keep track of whether or not a cone is being transferred
         boolean isConeBeingTransferred = false;
@@ -81,19 +83,33 @@ public class Artemis_TeleOp extends LinearOpMode {
             if(this.gamepad2.a) {intake.changeClaw(robot);}
             else {intake.buttonAReleased = true;}
 
+            // Prime/Close Latch Manual Control
+            if(gamepad2.guide) {deposit.changeLatch(robot);
+            } else {deposit.buttonReleased = true;}
+
+            // Rotate claw into Ground Intaking Position
+            if(gamepad2.x) {intake.GroundIntake(robot);
+            } else {intake.buttonXReleased = true;}
+
+            // Automatically move rotate claw with v4b movement
+            intake.updateRotateClaw(robot, increment);
+
+            // Set the claw to home position
+            if(this.gamepad2.y) {intake.resetToHome(robot, deposit);}
 
 
-//            if(this.gamepad2.left_bumper) {
-//                robot.rotateClaw.setPosition(robot.rotateClaw.getPosition() + 0.005);
-//            }
-//            if(this.gamepad2.right_bumper) {
-//                robot.rotateClaw.setPosition(robot.rotateClaw.getPosition() - 0.005);
-//            }
 
-            intake.updateRotateClaw(robot);
+            // Manual movement of the rotate claw servo
+            if(this.gamepad2.left_bumper && this.gamepad2.right_bumper) {
+                increment = 0;
+            } else if(this.gamepad2.left_bumper) {
+                increment -= 0.005;
+            } else if(this.gamepad2.right_bumper) {
+                increment += 0.005;
+            }
 
             // Transfer the cone from the claw to the deposit "cone-holder"
-            if(this.gamepad2.left_trigger > 0.5) {
+            if(this.gamepad2.b) {
                 isConeBeingTransferred = true;
                 intake.coneTransfer(robot,"Start", telemetry, deposit);
             }
@@ -102,19 +118,20 @@ public class Artemis_TeleOp extends LinearOpMode {
                 isConeBeingTransferred = intake.coneTransfer(robot, "Update", telemetry, deposit);
             }
 
-            telemetry.addData("Have the slides reached position? ", intake.SlidePositionReached);
-            telemetry.addData("Cone Transferring? ", isConeBeingTransferred);
-
-            if(this.gamepad2.y) {
-                intake.resetToHome(robot, deposit);
-            }
 
             if(robot.V4B_1.getPosition() > intake.V4B_HomePos && intake.movingToGround) {
                 robot.claw.setPosition(intake.openClawPos);
                 intake.movingToGround = false;
             }
 
+            // Stop the claw getting caught
+            if(robot.V4B_1.getPosition() < intake.V4B_HomePos - 0.149 && !isConeBeingTransferred) {
+                robot.spinClaw.setPosition(intake.clawFowardPos);
+                robot.claw.setPosition(intake.closedClawPos);
+            }
 
+
+            // Manual movement of the v4b
             if(this.gamepad2.right_stick_y < 0 && robot.V4B_1.getPosition() >= intake.V4B_TransferPos-0.01) {
                 robot.V4B_1.setPosition(robot.V4B_1.getPosition()-(Math.abs(this.gamepad2.right_stick_y/300)));
                 robot.V4B_2.setPosition(robot.V4B_2.getPosition()-(Math.abs(this.gamepad2.right_stick_y/300)));
@@ -124,14 +141,23 @@ public class Artemis_TeleOp extends LinearOpMode {
                 robot.V4B_2.setPosition(robot.V4B_2.getPosition()+(Math.abs(this.gamepad2.right_stick_y/300)));
             }
 
-            if(gamepad2.x) {
-                deposit.controlLatch(robot, "Open");
+            // Manual movement of the spin claw
+            if(this.gamepad2.left_trigger > 0.1 && this.gamepad2.right_trigger > 0.1) {
+                robot.spinClaw.setPosition(intake.clawFowardPos);
+
+            } else if(this.gamepad2.left_trigger > 0.1) {
+                robot.spinClaw.setPosition(robot.spinClaw.getPosition() + 0.03 * this.gamepad2.left_trigger);
+            } else if(this.gamepad2.right_trigger > 0.1) {
+                robot.spinClaw.setPosition(robot.spinClaw.getPosition() - 0.03 * this.gamepad2.right_trigger);
             }
+
+            // telemetry.addData("Claw Distance: ", robot.clawDistance.getDistance(DistanceUnit.MM));
+
 
             telemetry.addData("V4B: ", robot.V4B_1.getPosition());
 //            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
-//            telemetry.addData("Claw: ", robot.claw.getPosition());
-//            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
+            telemetry.addData("Claw: ", robot.claw.getPosition());
+            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
             telemetry.addData("Latch: ", robot.latch.getPosition());
             telemetry.addData("Latch mode: ", deposit.latchMode(robot));
 //            telemetry.addData("Robot: ", robot.enabled);
