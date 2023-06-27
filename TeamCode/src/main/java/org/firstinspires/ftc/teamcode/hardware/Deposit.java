@@ -22,7 +22,7 @@ public class Deposit {
     public int max = 3000;
     public int min = 0;
     int highJunction = 2375;
-    int midJunction = 1420;
+    int midJunction = 1600;
 
     double latchOpen = 0.1;
     double latchPrime = 0.5;
