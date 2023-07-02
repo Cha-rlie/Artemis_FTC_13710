@@ -3,53 +3,67 @@ package org.firstinspires.ftc.teamcode.hardware;
 // Import the necessary FTC modules and classes
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.Artemis_TeleOp;
-import org.firstinspires.ftc.teamcode.hardware.Deposit;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.util.concurrent.TimeUnit;
+import org.firstinspires.ftc.teamcode.Artemis_TeleOp;
 
 public class Intake {
     private static Intake instance = null;
     public boolean enabled;
     ElapsedTime mStateTime = new ElapsedTime();
 
-    public boolean groundIntake = false; // Is the Claw facing the ground?
+    // Variable to keep track of whether or not a cone is being transferred
+    public boolean isConeBeingTransferred = false;
+    public boolean cycleTransferCompete = false;
+    public boolean transferRunning = false;
+
+    public boolean lowJunctionPosition = false; // Is the Claw facing the ground?
     boolean clawBackwards = false; // Is the Claw facing backwards?
     public boolean clawState = true; // True = open
     public boolean buttonAReleased = true;
     public boolean buttonXReleased = true;
-    public boolean movingToGround = false;
+    public boolean movingToGround = false; // Has the reset home function been called
+    public boolean movingToIdle = false;
 
     // Transfer stoof
-    public double V4B_HomePos = 0.580; // Position where V4B is ready for intaking
-    public double V4B_TransferPos = 0.35; // Position where V4B is ready for transfer
-    public double V4B_IdlePos = 0.38;
-    public int intakeTransferPos = -400;
-    public int depositTransferPos = 320;
+    public double V4B_HomePos = 0.55; // Position where V4B is ready for intaking
+    public double V4B_GentleHomePos = 0.53; // Position where V4B is ready for intaking
+    public double V4B_TransferPos = 0.33; // Position where V4B is ready for transfer
+    public double V4B_IdlePos = 0.377; // Position where the claw is in dimension and out of the way (for general driving)
+    public int intakeTransferPos = 0;
+    public int intakeCyclePos = -1420;
+    public int depositTransferPos = 350;
 
     double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
     double rotateClaw_Ground = 0.5; // Position where RotateClaw is ready for ground intaking
+    public double increment = 0.1;
 
-    public double closedClawPos = 0; // Position where claw is closed
-    public double openClawPos = 0.3; // Position where claw is open
-    public double
+    public double closedClawPos = 0.32; // Position where claw is closed
+    public double openClawPos = 0.55; // Position where claw is open
+    public double midOpenClawPos = 0.45; // Position where claw is open enough to release cone during transfer
+    public boolean restrictClawMovement = false;
 
-    public double clawFowardPos = 0.709;
+    public double clawFowardPos = 0.712;
     public double clawBackwardsPos = 0.050;
 
     public int intakeHome = 0; // Fully contracted position
     public int intakeOut = -3000 ; // Fully extended position -2000
+    double powerValue;
 
     public boolean SlidePositionReached;
     boolean V4BPositionReached;
     boolean DepositReached;
+    public boolean cycleRunning = false;
+    public boolean cycleSlidesHaveReachedPos = false;
+    double targetChange;
+    public boolean isRotatedBack = false;
 
     public static Intake getInstance() {
         if (instance == null) {
@@ -60,26 +74,6 @@ public class Intake {
     }
 
     public void init(RobotHardware robot, Telemetry telemetry) {
-        double current = 0;
-        int exceededCount = 0;
-
-        while(current <= 1) {
-            current = (robot.intakeLeft.getCurrent(CurrentUnit.AMPS)+robot.intakeRight.getCurrent(CurrentUnit.AMPS))/2;
-            robot.intakeLeft.setPower(0.2);
-            robot.intakeRight.setPower(0.2);
-            telemetry.addData("Current Draw: ", current);
-            telemetry.update();
-        }
-
-        robot.intakeLeft.setPower(0);
-        robot.intakeRight.setPower(0);
-
-        telemetry.addData("Intake Reset", "");
-        telemetry.update();
-
-        robot.intakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         robot.claw.setPosition(closedClawPos);
 
         mStateTime.reset();
@@ -87,17 +81,40 @@ public class Intake {
 
         }
 
-        updateRotateClaw(robot, 0);
+        robot.V4B_1.setPosition(V4B_IdlePos);
+        robot.V4B_2.setPosition(V4B_IdlePos);
         robot.spinClaw.setPosition(clawFowardPos);
-        robot.V4B_1.setPosition(V4B_HomePos);
-        robot.V4B_2.setPosition(V4B_HomePos);
+
+        updateRotateClaw(robot, 0);
+
+        double current = 0;
+        int exceededCount = 0;
+
+        while(current <= 1) {
+            current = (robot.intakeLeft.getCurrent(CurrentUnit.AMPS)+robot.intakeRight.getCurrent(CurrentUnit.AMPS))/2;
+            robot.intakeLeft.setPower(0.2);
+            robot.intakeRight.setPower(0.2);
+        }
+
+        robot.intakeLeft.setPower(0);
+        robot.intakeRight.setPower(0);
+
+        robot.intakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        cycleRunning = false;
+
     }
 
     public void changeClaw(RobotHardware robot) {
         if (buttonAReleased) {
             buttonAReleased = false;
             if(!clawState) {
-                robot.claw.setPosition(openClawPos);
+                if(restrictClawMovement) {
+                    robot.claw.setPosition(midOpenClawPos);
+                } else {
+                    robot.claw.setPosition(openClawPos);
+                }
                 clawState = true;
             } else if(clawState) {
                 robot.claw.setPosition(closedClawPos);
@@ -106,122 +123,171 @@ public class Intake {
         }
     }
 
-    public void GroundIntake(RobotHardware robot) {
+    public void scoreLow(RobotHardware robot) {
         if (buttonXReleased) {
             buttonXReleased = false;
-            if(!groundIntake) {
-                robot.rotateClaw.setPosition(rotateClaw_Ground);
-                groundIntake = true;
-            } else if(groundIntake) {
-                robot.rotateClaw.setPosition(rotateClaw_HomePos);
-                groundIntake = false;
+            if(!lowJunctionPosition) {
+                increment = increment - 0.25;
+                lowJunctionPosition = true;
+            } else if(lowJunctionPosition) {
+                increment = increment + 0.25;
+                lowJunctionPosition = false;
             }
         }
     }
 
     public double resetToHome(RobotHardware robot, Deposit deposit) {
-        robot.V4B_1.setPosition(V4B_HomePos);
-        robot.V4B_2.setPosition(V4B_HomePos);
-        robot.spinClaw.setPosition(clawFowardPos);
         movingToGround = true;
-        deposit.heldPosition = 0;
-        return(0);
+        return(increment);
+    }
+
+    public void resetToIdle(RobotHardware robot) {
+        movingToIdle = true;
+    }
+
+    public double intakeMotionProfile(RobotHardware robot, double distanceFromTarget) {
+//        powerValue = Math.pow(1.115 , (1.84 * distanceFromTarget)) * 0.00003;
+        double a = 0.0297803;
+        double b = 3.09586;
+        double k = 0.0121099;
+        double c = 0.0823633;
+
+        powerValue = Math.pow(b , (k * distanceFromTarget)) * a + c;
+
+        // Cap values
+        if(powerValue > 1) {powerValue = 1;}
+        if(powerValue < 0) {powerValue = 0;}
+
+        return(powerValue);
     }
 
     public void runIntake(RobotHardware robot, int targetPosition, Telemetry telemetry, double power) {
-        robot.intakeLeft.setTargetPosition(targetPosition);
-        robot.intakeRight.setTargetPosition(targetPosition);
-        robot.intakeLeft.setPower(power);
-        robot.intakeRight.setPower(power);
-        robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        power = Math.abs(power);
+        double multiplier = intakeMotionProfile(robot, robot.valueOff(robot.intakeLeft.getCurrentPosition(), targetPosition));
+
+        robot.intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        if(robot.intakeLeft.getCurrentPosition() < targetPosition - 5) {
+            robot.intakeLeft.setPower(power * multiplier);
+            robot.intakeRight.setPower(power * multiplier);
+        } else if (robot.intakeLeft.getCurrentPosition() > targetPosition + 5) {
+            robot.intakeLeft.setPower(-power * multiplier);
+            robot.intakeRight.setPower(-power * multiplier);
+        }
     }
 
-    public void updateRotateClaw(RobotHardware robot, double increment) {
+    public int updateRotateClaw(RobotHardware robot, double increment) {
+        int rotationEncoder = robot.rearRight.getCurrentPosition();
         double gradient = -0.722063;
-        double cintercept =0.957285 + increment;
+        double cintercept =0.957285 - 0.05 + increment;
         robot.rotateClaw.setPosition(gradient * robot.V4B_1.getPosition() + cintercept);
+        return(rotationEncoder);
     }
-
-    boolean transferRunning = false;
 
     public boolean coneTransfer (RobotHardware robot, String mode, Telemetry telemetry, Deposit deposit) {
+        // Run the checks
+        if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeTransferPos, 10)) {SlidePositionReached = true;}
+        if (robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_TransferPos, 0.01)) {V4BPositionReached = true;}
+        if (robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), depositTransferPos, 10)) {DepositReached = true;}
+
         // Do things just once at the beginning
         if (mode == "Start" && !transferRunning) {
             transferRunning = true;
-
+            isConeBeingTransferred = true;
             robot.claw.setPosition(closedClawPos);
-
             SlidePositionReached = false; // Holds whether desired position for intake slides has been reached
             V4BPositionReached = false; // Holds whether desired position for v4b has been reached
             DepositReached = false;
+            isRotatedBack = false;
+            targetChange = 0;
+            increment += 0.14;
+
+            deposit.controlLatch(robot, "Prime");
+
         }
 
         if (!SlidePositionReached) {
-            deposit.controlLatch(robot, "Prime");
-            robot.V4B_1.setPosition(V4B_TransferPos);
-            robot.V4B_2.setPosition(V4B_TransferPos);
-            robot.spinClaw.setPosition(clawBackwardsPos);
-
-            robot.intakeLeft.setTargetPosition(intakeTransferPos);
-            robot.intakeRight.setTargetPosition(intakeTransferPos);
-            robot.intakeLeft.setPower(1);
-            robot.intakeRight.setPower(1);
-            robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            //runIntake(robot, intakeTransferPos, telemetry, 1);
-
-            if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeTransferPos, 10)) {
-                // If the slides have reached the correct position...
-                SlidePositionReached = true;
-            }
+            runIntake(robot, intakeTransferPos, telemetry, 1);
         }
 
-        if(robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_TransferPos, 0.005)) {
-            // If the v4b has reached the correct position...
-            V4BPositionReached = true;
-        }
-
-
-        if(SlidePositionReached && V4BPositionReached) {
+        if(!DepositReached) {
             deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
+            deposit.heldPosition = depositTransferPos;
+        }
 
-//            robot.depositLeft.setTargetPosition(depositTransferPos);
-//            robot.depositRight.setTargetPosition(depositTransferPos);
-//            robot.depositLeft.setPower(0.6);
-//            robot.depositRight.setPower(0.6);
-//            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(!V4BPositionReached) {
+            if(robot.V4B_1.getPosition() > V4B_TransferPos) {
+                targetChange -= 0.0005;
+            } else if(robot.V4B_1.getPosition() < V4B_TransferPos) {
+                targetChange += 0.0005;
+            }
 
-            if (robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), depositTransferPos, 10)) {
-                // If the v4b has reached the correct position...
-                DepositReached = true;
+            robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
+            robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
+        }
+
+        if(robot.V4B_1.getPosition() < V4B_HomePos-0.05) { // Because the claw sometimes gets stuck on the string, it is best to wait till the claw has cleared it
+            robot.spinClaw.setPosition(clawBackwardsPos);
+        }
+
+        // There is a certain point where the claw needs to be spun back so it latches into the transfer platform
+        if(robot.V4B_1.getPosition() < V4B_IdlePos) {
+            if(!isRotatedBack) {
+                increment -= 0.14;
+                isRotatedBack = true;
             }
         }
 
         if (SlidePositionReached && V4BPositionReached && DepositReached) {
             deposit.controlLatch(robot, "Close");
-            robot.claw.setPosition(openClawPos - 0.08);
+            robot.claw.setPosition(midOpenClawPos);
         }
 
 
-
         if(SlidePositionReached && V4BPositionReached && DepositReached && deposit.latchMode(robot) == "Close") {
-            resetToHome(robot, deposit);
-            transferRunning = false;
+//            if(cycleRunning) {
+//                resetToHome(robot, deposit);
+//            } else {
+//                resetToIdle(robot);
+//            }
+//
+//            cycleTransferCompete = true;
+
             return false;
         } else {
             return true;
         }
-
     }
 
-    public void cycle(DcMotorEx IntakeLeft, DcMotorEx IntakeRight, int IntakeOut) {
-        IntakeLeft.setTargetPosition(IntakeOut);
-        IntakeRight.setTargetPosition(IntakeOut);
-        IntakeLeft.setPower(1);
-        IntakeRight.setPower(1);
-    }
+    public void cycle(RobotHardware robot, Deposit deposit, Intake intake, Telemetry telemetry, Gamepad gamepad2) {
+        if(!cycleRunning) {
+            cycleRunning = true;
+            resetToHome(robot, deposit);
+            cycleSlidesHaveReachedPos = false;
+        }
 
+        if(!cycleSlidesHaveReachedPos) {
+            intake.runIntake(robot, intake.intakeCyclePos, telemetry, 1);
+        }
+
+        if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeCyclePos, 10)) {
+            cycleSlidesHaveReachedPos = true;
+        }
+
+        if(cycleSlidesHaveReachedPos && gamepad2.a) {
+            intake.runIntake(robot, intake.intakeCyclePos - 400, telemetry, 1);
+        }
+
+        if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeCyclePos - 400, 10)) {
+            robot.claw.setPosition(closedClawPos);
+
+            mStateTime.reset();
+            while (mStateTime.seconds() <= 0.5) {}
+
+            isConeBeingTransferred = true;
+            intake.coneTransfer(robot,"Start", telemetry, deposit);
+        }
+
+    }
 }

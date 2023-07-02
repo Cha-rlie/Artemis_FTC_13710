@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -25,8 +26,8 @@ public class Deposit {
     int midJunction = 1600;
 
     double latchOpen = 0.1;
-    double latchPrime = 0.5;
-    double latchClose = 0.65;
+    double latchPrime = 0.3;
+    double latchClose = 0.7;
 
     public int automatedMoveTargetPosition;
     public boolean automationWasSet;
@@ -44,6 +45,7 @@ public class Deposit {
         double current = 0;
         controlLatch(robot, "Close");
 
+
         while(current <= 3) {
             current = (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2;
             robot.depositLeft.setPower(-0.5);
@@ -51,9 +53,6 @@ public class Deposit {
             telemetry.addData("Current Draw: ", current);
             telemetry.update();
         }
-
-        telemetry.addData("Deposit Reset", "");
-        telemetry.update();
 
         robot.depositLeft.setPower(0);
         robot.depositRight.setPower(0);
@@ -66,6 +65,7 @@ public class Deposit {
         if (mode == "Manual") {
             // Stop the automation
             automationWasSet = false;
+            zeroWasTargetted = false;
 
             robot.depositLeft.setTargetPosition(targetPosition);
             robot.depositRight.setTargetPosition(targetPosition);
@@ -75,38 +75,51 @@ public class Deposit {
             robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             heldPosition = robot.depositLeft.getCurrentPosition();
 
-        } else if (mode == "High" || mode == "Medium" || mode == "Low" || automationWasSet || zeroWasTargetted) {
-            // Change the variable to demonstrate that an automation command was just set
-            if (mode == "High" || mode == "Medium" || mode == "Low") {automationWasSet = true;}
+        } else if (mode == "High" || mode == "Medium" || automationWasSet || zeroWasTargetted) {
+            heldPosition = 0;
 
+            // Change the variable to demonstrate that an automation command was just set
+            if (mode == "High" || mode == "Medium") {automationWasSet = true;}
             // Set the desired automated values
             if (mode == "High") {
-                automatedMoveTargetPosition = highJunction; controlLatch(robot, "Close");} else if (mode == "Medium") {
-                automatedMoveTargetPosition = midJunction; controlLatch(robot, "Close");} else if (mode == "Low") {
-                automatedMoveTargetPosition = min; controlLatch(robot, "Close");controlLatch(robot, "Close");}
+                automatedMoveTargetPosition = highJunction; controlLatch(robot, "Close");}
+            else if (mode == "Medium") {
+                automatedMoveTargetPosition = midJunction; controlLatch(robot, "Close");}
 
-            robot.depositLeft.setTargetPosition(automatedMoveTargetPosition);
-            robot.depositRight.setTargetPosition(automatedMoveTargetPosition);
-            robot.depositLeft.setPower(1);
-            robot.depositRight.setPower(1);
-            robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.depositLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.depositRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            if(robot.depositLeft.getCurrentPosition() < automatedMoveTargetPosition) {
+                robot.depositLeft.setPower(1);
+                robot.depositRight.setPower(1);
+            } else if (robot.depositLeft.getCurrentPosition() > automatedMoveTargetPosition+50) {
+                robot.depositLeft.setPower(-1);
+                robot.depositRight.setPower(-1);
+            } else {
+                robot.depositLeft.setPower(-0.6);
+                robot.depositRight.setPower(-0.6);
+            }
 
-            if (zeroWasTargetted == true && robot.withinUncertainty(robot.depositRight.getCurrentPosition(), min, 10)) {
+            if (zeroWasTargetted == true && robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), min, 10)) {
                 zeroWasTargetted = false;
 
-            } else if (automationWasSet == true && robot.withinUncertainty(robot.depositRight.getCurrentPosition(), automatedMoveTargetPosition, 10)) {
+            } else if (automationWasSet == true && robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), automatedMoveTargetPosition, 10)) {
                 //this.runDeposit(robot, min, "Low", telemetry);
                 zeroWasTargetted = true;
                 automationWasSet = false;
                 automatedMoveTargetPosition = 0;
-                robot.depositLeft.setTargetPosition(automatedMoveTargetPosition);
-                robot.depositRight.setTargetPosition(automatedMoveTargetPosition);
-                robot.depositLeft.setPower(1);
-                robot.depositRight.setPower(1);
-                robot.depositLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.depositRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
                 controlLatch(robot, "Prime");
+
+                robot.depositLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.depositRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                if(robot.depositLeft.getCurrentPosition() > automatedMoveTargetPosition + 100) {
+                    robot.depositLeft.setPower(-1);
+                    robot.depositRight.setPower(-1);
+
+                } if(robot.depositLeft.getCurrentPosition() < automatedMoveTargetPosition + 100) {
+                    robot.depositLeft.setPower(-0.2);
+                    robot.depositRight.setPower(-0.2);
+                }
             }
 
         } else if (!automationWasSet && !zeroWasTargetted){

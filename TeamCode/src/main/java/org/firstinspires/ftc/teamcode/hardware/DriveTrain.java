@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.hardware;
 // Import the necessary FTC modules and classes
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class DriveTrain {
 
@@ -14,7 +17,13 @@ public class DriveTrain {
     public boolean enabled;
 
     public void init(RobotHardware robot) {
-
+        // Retrieve the IMU from the hardware map
+        // Adjust the orientation parameters to match your robot
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        robot.imu.initialize(parameters);
     }
 
     // Function to return either a new or existing instance of this class
@@ -27,35 +36,36 @@ public class DriveTrain {
     }
 
     public void runDriveTrain(RobotHardware robot, Telemetry telemetry, Gamepad gamepad1) {
-        // Initialise the input values from first controller for the drive base
-        float xInput = (float)(gamepad1.right_stick_x*1.1); // Account for imperfect strafing
-        float yInput = -gamepad1.right_stick_y; // One side needs to be reversed
-        float rInput = gamepad1.left_stick_x;
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x;
 
-        boolean slowSpeed = gamepad1.left_bumper;
-        boolean fastSpeed = gamepad1.right_bumper;
-
-        // Variable to change the percentage the speed should be set at
-        double speedModifier;
-
-        // Change the speedModifier based off the bumpers pressed on the gamepad
-        if (slowSpeed && !fastSpeed) {
-            speedModifier = 0.4;
-        } else if (fastSpeed && !slowSpeed) {
-            speedModifier = 1;
-        } else {
-            speedModifier = 0.7;
+        // This button choice was made so that it is hard to hit on accident,
+        // it can be freely changed based on preference.
+        // The equivalent button is start on Xbox-style controllers.
+        if (gamepad1.guide) {
+            robot.imu.resetYaw();
         }
 
-        // Returns the largest denominator that the power of the motors must be divided by to keep their original ratio
-        double ratioScalingDenominator = Math.max(Math.abs(yInput) + Math.abs(xInput) + Math.abs(rInput), 1);
+        double botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
+        // Rotate the movement direction counter to the bot's rotation
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
-        // Drive the drive base with mecanum code
-        robot.frontLeft.setPower(((yInput + xInput + rInput) / ratioScalingDenominator)*speedModifier);
-        robot.frontRight.setPower(((yInput - xInput - rInput) / ratioScalingDenominator)*speedModifier);
-        robot.rearLeft.setPower(((yInput - xInput + rInput) / ratioScalingDenominator)*speedModifier);
-        robot.rearRight.setPower(((yInput + xInput - rInput) / ratioScalingDenominator)*speedModifier);
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
+
+        robot.frontLeft.setPower(frontLeftPower);
+        robot.rearLeft.setPower(backLeftPower);
+        robot.frontRight.setPower(frontRightPower);
+        robot.rearRight.setPower(backRightPower);
 
     }
 
