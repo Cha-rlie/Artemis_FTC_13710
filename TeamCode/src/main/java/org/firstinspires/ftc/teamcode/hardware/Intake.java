@@ -227,12 +227,9 @@ public class Intake {
             robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
         }
 
-        if(robot.V4B_1.getPosition() < V4B_HomePos-0.05) { // Because the claw sometimes gets stuck on the string, it is best to wait till the claw has cleared it
-            robot.spinClaw.setPosition(clawBackwardsPos);
-        }
 
         // There is a certain point where the claw needs to be spun back so it latches into the transfer platform
-        if(robot.V4B_1.getPosition() < V4B_IdlePos) {
+        if(robot.V4B_1.getPosition() < V4B_IdlePos || SlidePositionReached || DepositReached) {
             if(!isRotatedBack) {
                 increment -= 0.14;
                 isRotatedBack = true;
