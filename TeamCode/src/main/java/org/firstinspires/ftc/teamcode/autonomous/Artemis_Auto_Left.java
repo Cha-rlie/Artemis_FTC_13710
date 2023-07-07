@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 // Import the classes necessary to run RoadRunner
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RoadRunnerStoof.drive.SampleMecanumDrive;
 
 // Import the custom-made hardware classes
+import org.firstinspires.ftc.teamcode.RoadRunnerStoof.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.hardware.Deposit;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
@@ -24,7 +24,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 
 @Autonomous
 
-public class Artemis_Auto extends LinearOpMode {
+public class Artemis_Auto_Left extends LinearOpMode {
 
     // Initialise instances of all the custom-made hardware classes/objects
     private RobotHardware robot = RobotHardware.getInstance();
@@ -32,23 +32,23 @@ public class Artemis_Auto extends LinearOpMode {
     private Intake intake = Intake.getInstance();
     private Deposit deposit = Deposit.getInstance();
 
-    // Set-up the camera view
-    public int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-    public OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
-
-    // Initialise the instance of the class to detect the cone sleeve's side
-    private Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
-
-    // Get the desired parking location
-    String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
-
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
         // Initialise all the custom-made hardware objects
         robot.init(hardwareMap);
         driveTrain.init(robot);
         intake.init(robot, telemetry);
         deposit.init(robot, telemetry);
+
+        // Set-up the camera view
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
+
+        // Initialise the instance of the class to detect the cone sleeve's side
+        Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
+
+        // Get the desired parking location as a string
+        String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
 
         // Create RoadRunner objects
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -57,17 +57,25 @@ public class Artemis_Auto extends LinearOpMode {
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(startPos);
 
-        Trajectory ArtemisAutoTesting = drive.trajectoryBuilder(startPos)
-                .forward(40)
+        TrajectorySequence ArtemisAutoTesting = drive.trajectorySequenceBuilder(startPos)
+                .forward(45)
+                .turn(Math.toRadians(105))
                 .build();
 
         waitForStart();
 
-        drive.followTrajectory(ArtemisAutoTesting);
+        drive.followTrajectorySequence(ArtemisAutoTesting);
+        deposit.runDeposit(robot, 0, "High", telemetry);
+        //intake.cycle(robot, deposit, intake, telemetry, gamepad2);
 
         telemetry.addData("Place to park", parkingLocation);
+        telemetry.update();
 
-        if(isStopRequested()) return;
+        while (opModeIsActive()) {
+
+        }
+
+        //if(isStopRequested()) return;
 
         // Produce all the RoadRunner trajectories
 //        Trajectory driveToCyclingPosition = RRDriveSystem.trajectoryBuilder(new Pose2d())

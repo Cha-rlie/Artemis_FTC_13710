@@ -36,9 +36,17 @@ public class DriveTrain {
     }
 
     public void runDriveTrain(RobotHardware robot, Telemetry telemetry, Gamepad gamepad1) {
-        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-        double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-        double rx = gamepad1.right_stick_x;
+        double y = -gamepad1.right_stick_y; // Remember, this is reversed!
+        double x = gamepad1.right_stick_x * 1.1; // Counteract imperfect strafing
+        double rx = gamepad1.left_stick_x;
+
+        double speedModifier = 0.7;
+
+        if (gamepad1.left_bumper) {
+            speedModifier = 0.3;
+        } else if (gamepad1.right_bumper) {
+            speedModifier = 1;
+        }
 
         // This button choice was made so that it is hard to hit on accident,
         // it can be freely changed based on preference.
@@ -62,10 +70,10 @@ public class DriveTrain {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        robot.frontLeft.setPower(frontLeftPower);
-        robot.rearLeft.setPower(backLeftPower);
-        robot.frontRight.setPower(frontRightPower);
-        robot.rearRight.setPower(backRightPower);
+        robot.frontLeft.setPower(frontLeftPower*speedModifier);
+        robot.rearLeft.setPower(backLeftPower*speedModifier);
+        robot.frontRight.setPower(frontRightPower*speedModifier);
+        robot.rearRight.setPower(backRightPower*speedModifier);
 
     }
 
