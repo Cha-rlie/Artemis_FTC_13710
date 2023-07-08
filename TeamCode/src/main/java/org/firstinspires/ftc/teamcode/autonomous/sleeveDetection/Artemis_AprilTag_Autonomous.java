@@ -103,17 +103,18 @@ public class Artemis_AprilTag_Autonomous
                         tagFound = true;
                         break;
                     }
-
-                    if (tag.id == LEFT) {return "LEFT";}
-                    else if (tag.id == MIDDLE) {return "MIDDLE";}
-                    else if (tag.id == RIGHT) {return "RIGHT";}
-                    else {return "NOT FOUND";}
                 }
 
                 if(tagFound)
                 {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    //tagToTelemetry(tagOfInterest);
+                    telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));
+
+                    if (tagOfInterest.id == LEFT) {telemetry.addLine("LEFT");return "LEFT";}
+                    else if (tagOfInterest.id == MIDDLE) {telemetry.addLine("MIDDLE");return "MIDDLE";}
+                    else if (tagOfInterest.id == RIGHT) {telemetry.addLine("RIGHT");return "RIGHT";}
+                    else {return "NOT FOUND";}
+
                 }
                 else
                 {
@@ -126,7 +127,7 @@ public class Artemis_AprilTag_Autonomous
                     else
                     {
                         telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        //tagToTelemetry(tagOfInterest);
+                        telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));
                     }
                 }
 

@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.hardware;
 // Import the necessary FTC modules and classes
 //import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+import android.transition.Slide;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -35,11 +37,12 @@ public class Intake {
     // Transfer stoof
     public double V4B_HomePos = 0.55; // Position where V4B is ready for intaking
     public double V4B_GentleHomePos = 0.53; // Position where V4B is ready for intaking
-    public double V4B_TransferPos = 0.33; // Position where V4B is ready for transfer
+    public double V4B_TransferPos = 0.31; // Position where V4B is ready for transfer
     public double V4B_IdlePos = 0.377; // Position where the claw is in dimension and out of the way (for general driving)
     public int intakeTransferPos = 0;
     public int intakeCyclePos = -1420;
-    public int depositTransferPos = 350;
+    public int depositTransferPos = 380;
+    public int depositMidTransferPos = 150;
 
     double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
     double rotateClaw_Ground = 0.5; // Position where RotateClaw is ready for ground intaking
@@ -51,7 +54,7 @@ public class Intake {
     public boolean restrictClawMovement = false;
 
     public double clawFowardPos = 0.712;
-    public double clawBackwardsPos = 0.050;
+    public double clawBackwardsPos = 0.090;
 
     public int intakeHome = 0; // Fully contracted position
     public int intakeOut = -3000 ; // Fully extended position -2000
@@ -83,6 +86,8 @@ public class Intake {
 
         robot.V4B_1.setPosition(V4B_IdlePos);
         robot.V4B_2.setPosition(V4B_IdlePos);
+
+
         robot.spinClaw.setPosition(clawFowardPos);
 
         updateRotateClaw(robot, 0);
@@ -201,20 +206,29 @@ public class Intake {
             DepositReached = false;
             isRotatedBack = false;
             targetChange = 0;
-            increment += 0.14;
 
             deposit.controlLatch(robot, "Prime");
-
+            increment += 0.15;
         }
 
         if (!SlidePositionReached) {
             runIntake(robot, intakeTransferPos, telemetry, 1);
         }
 
-        if(!DepositReached) {
-            deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
-            deposit.heldPosition = depositTransferPos;
+        if(robot.V4B_1.getPosition() < V4B_HomePos - 0.1) {
+            robot.spinClaw.setPosition(clawBackwardsPos);
         }
+
+        if(SlidePositionReached) {
+            robot.intakeLeft.setTargetPosition(intakeTransferPos);
+            robot.intakeRight.setTargetPosition(intakeTransferPos);
+            robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.intakeLeft.setPower(1);
+            robot.intakeRight.setPower(1);
+        }
+
 
         if(!V4BPositionReached) {
             if(robot.V4B_1.getPosition() > V4B_TransferPos) {
@@ -229,27 +243,38 @@ public class Intake {
 
 
         // There is a certain point where the claw needs to be spun back so it latches into the transfer platform
-        if(robot.V4B_1.getPosition() < V4B_IdlePos || SlidePositionReached || DepositReached) {
-            if(!isRotatedBack) {
-                increment -= 0.14;
-                isRotatedBack = true;
-            }
-        }
+//        if(robot.V4B_1.getPosition() < V4B_TransferPos+0.01 && SlidePositionReached && DepositReached) {
+//            if(!isRotatedBack) {
+//                isRotatedBack = true;
+//                increment -= 0.2;
+//            }
+//        }
 
         if (SlidePositionReached && V4BPositionReached && DepositReached) {
             deposit.controlLatch(robot, "Close");
             robot.claw.setPosition(midOpenClawPos);
         }
 
+        if(!SlidePositionReached && !V4BPositionReached) {
+            deposit.runDeposit(robot, depositMidTransferPos, "Manual", telemetry);
+            deposit.heldPosition = depositMidTransferPos;
+        }
+
+
+        if (SlidePositionReached && V4BPositionReached) {
+            deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
+            deposit.heldPosition = depositTransferPos;
+        }
+
 
         if(SlidePositionReached && V4BPositionReached && DepositReached && deposit.latchMode(robot) == "Close") {
-//            if(cycleRunning) {
-//                resetToHome(robot, deposit);
-//            } else {
-//                resetToIdle(robot);
-//            }
-//
-//            cycleTransferCompete = true;
+            if(cycleRunning) {
+                resetToHome(robot, deposit);
+            } else {
+                resetToIdle(robot);
+            }
+
+            cycleTransferCompete = true;
 
             return false;
         } else {
@@ -287,4 +312,15 @@ public class Intake {
         }
 
     }
+
+    public double toV4Bposition(int degrees) {
+        return(((degrees * 4.0f / 7.0f) / 300.0f) + V4B_HomePos);
+    }
+
+    public double getRotationDegrees(int ticks, Telemetry telemetry) {
+        telemetry.addData("Ticks Count: ", ticks);
+        return(ticks * 0.0439453125);
+    }
+
+
 }

@@ -40,16 +40,6 @@ public class Artemis_Auto_Left extends LinearOpMode {
         intake.init(robot, telemetry);
         deposit.init(robot, telemetry);
 
-        // Set-up the camera view
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
-
-        // Initialise the instance of the class to detect the cone sleeve's side
-        Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
-
-        // Get the desired parking location as a string
-        String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
-
         // Create RoadRunner objects
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -62,16 +52,35 @@ public class Artemis_Auto_Left extends LinearOpMode {
                 .turn(Math.toRadians(105))
                 .build();
 
-        waitForStart();
+        // Initialise the instance of the class to detect the cone sleeve's side
 
-        drive.followTrajectorySequence(ArtemisAutoTesting);
-        deposit.runDeposit(robot, 0, "High", telemetry);
+//        drive.followTrajectorySequence(ArtemisAutoTesting);
+//        deposit.runDeposit(robot, 0, "High", telemetry);
         //intake.cycle(robot, deposit, intake, telemetry, gamepad2);
 
-        telemetry.addData("Place to park", parkingLocation);
-        telemetry.update();
+        // Set-up the camera view
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
+
+        Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
+
+        // Get the desired parking location as a string
+        String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
+
+        while (!opModeIsActive() && parkingLocation != "NOT FOUND") {
+            parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
+            telemetry.addData("Place to park", parkingLocation);
+            telemetry.update();
+        }
+
+        waitForStart();
+
+        if (parkingLocation == "NOT FOUND") {
+            parkingLocation = "LEFT";
+        }
 
         while (opModeIsActive()) {
+
 
         }
 

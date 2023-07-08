@@ -86,7 +86,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             } else {intake.buttonXReleased = true;}
 
             // Automatically move rotate claw with v4b movement
-            telemetry.addData("Rotation Encoder: ", intake.updateRotateClaw(robot, intake.increment));
+            telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
 
             // Set the claw to home position
             if(this.gamepad2.y) {
@@ -229,8 +229,8 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             telemetry.addData("Intake: ", robot.intakeLeft.getCurrentPosition());
 
-            telemetry.addData("TransferRunning: ", intake.transferRunning);
-            telemetry.addData("IsConeBeingTransferred", intake.isConeBeingTransferred);
+//            telemetry.addData("TransferRunning: ", intake.transferRunning);
+//            telemetry.addData("IsConeBeingTransferred", intake.isConeBeingTransferred);
 
             telemetry.addData("V4B: ", robot.V4B_1.getPosition());
 //            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
@@ -239,7 +239,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 //            telemetry.addData("Latch: ", robot.latch.getPosition());
 //            telemetry.addData("Latch mode: ", deposit.latchMode(robot));
 //            telemetry.addData("Robot: ", robot.enabled);
-            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
+//            telemetry.addData("Deposit: ", (robot.depositLeft.getCurrentPosition() + robot.depositRight.getCurrentPosition()) / 2);
 //            telemetry.addData("Deposit Current Draw", (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2);
 
             // Update the telemetry's information screen

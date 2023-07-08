@@ -26,7 +26,7 @@ public class Deposit {
     int midJunction = 1600;
 
     double latchOpen = 0.1;
-    double latchPrime = 0.3;
+    double latchPrime = 0.5;
     double latchClose = 0.7;
 
     public int automatedMoveTargetPosition;
