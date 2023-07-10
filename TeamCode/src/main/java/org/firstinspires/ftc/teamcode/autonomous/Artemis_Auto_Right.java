@@ -37,82 +37,58 @@ public class Artemis_Auto_Right extends LinearOpMode {
         intake.init(robot, telemetry);
         deposit.init(robot, telemetry);
 
+        // Create RoadRunner objects
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // Create the position that the RoadRunner will be told the robot starts at
+        Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
+        drive.setPoseEstimate(startPos);
+
+        // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
+        TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
+                .forward(47)
+                .turn(Math.toRadians(-105))
+                .back(4)
+                .build();
+
         // Set-up the camera view
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
 
-        // Initialise the instance of the class to detect the cone sleeve's side
+        // Create an instance of the class to detect the AprilTags
         Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
 
         // Get the desired parking location as a string
         String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
 
-        // Create RoadRunner objects
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // Keep looking for a parking location either until one is found or the START button is pressed
+        while (!opModeIsActive() && parkingLocation == "NOT FOUND") {
+            parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
+            telemetry.addData("Place to park", parkingLocation);
+            telemetry.update();
+        }
 
-        Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
-        drive.setPoseEstimate(startPos);
-
-        TrajectorySequence ArtemisAutoTesting = drive.trajectorySequenceBuilder(startPos)
-                .forward(45)
-                .turn(Math.toRadians(-105))
-                .build();
-
+        // Wait for the START button to be pressed
         waitForStart();
 
-        drive.followTrajectorySequence(ArtemisAutoTesting);
-        deposit.runDeposit(robot, 0, "High", telemetry);
-        //intake.cycle(robot, deposit, intake, telemetry, gamepad2);
+        if (parkingLocation == "NOT FOUND") {
+            parkingLocation = "MIDDLE";
+        }
 
-        telemetry.addData("Place to park", parkingLocation);
-        telemetry.update();
+        // Move the robot to the position where it can cycle cones
+        drive.followTrajectorySequence(driveToCyclingPosRight);
+
+        // Start the deposit "High" scoring program
+        deposit.runDeposit(robot, 0, "High", telemetry);
+
+        // Continue the deposit "High" scoring program until it finishes
+        while (deposit.automationWasSet || deposit.zeroWasTargetted) {
+            deposit.runDeposit(robot, 0, "Update", telemetry);
+        }
 
         while (opModeIsActive()) {
 
         }
-
-        //if(isStopRequested()) return;
-
-        // Produce all the RoadRunner trajectories
-//        Trajectory driveToCyclingPosition = RRDriveSystem.trajectoryBuilder(new Pose2d())
-//                .forward(58)
-//                .build();
-
-
-//        TrajectorySequence ArtemisAutoTesting = drive.trajectorySequenceBuilder(new Pose2d(-34.14, -71.57, Math.toRadians(90.00)))
-//                .splineTo(new Vector2d(-58.3600, -54), 4.3832)
-//                .build();
-//        drive.setPoseEstimate(ArtemisAutoTesting.start());
-
-
-//        Trajectory driveToLeftParkingPosition = drive.trajectoryBuilder(driveToCyclingPosition.end().plus(new Pose2d(0,0, Math.toRadians(100))))
-//                .strafeLeft(20)
-//                .build();
-
-        // Wait for the driver to click the "Play" button before proceeding
-
-
-
-        // Drive the robot to its cycling position and rotate to the right angle
-
-        //drive.turn(Math.toRadians(100));
-
-       // Score the preloaded cone
-//        boolean depositRun = false;
-//        deposit.runDeposit(robot, 0, "High", telemetry);
-//        while (!depositRun) {
-//            depositRun = deposit.runDeposit(robot, 0, "Update", telemetry);
-//        }
-        // Cycling through the stack of cones
-//        for (int coneToGrab = 5; coneToGrab < 1; coneToGrab--) {
-//            intake.extendAndGrab(robot, deposit, coneToGrab, intake.intakeOut, telemetry);
-//            intake.coneTransfer(robot, "Start", telemetry, deposit);
-//            deposit.runDeposit(robot, 0, "High", telemetry);
-//        }
-
-        // Run until the "Stop" button is pressed
-
-
     }
 }

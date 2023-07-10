@@ -21,7 +21,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 
 @Autonomous
 
-public class Artemis_Auto_Left extends LinearOpMode {
+public class Artemis_Auto_Just_Parking extends LinearOpMode {
 
     // Initialise instances of all the custom-made hardware classes/objects
     private RobotHardware robot = RobotHardware.getInstance();
@@ -30,7 +30,7 @@ public class Artemis_Auto_Left extends LinearOpMode {
     private Deposit deposit = Deposit.getInstance();
 
     @Override
-    public void runOpMode() throws InterruptedException{
+    public void runOpMode() throws InterruptedException {
         // Initialise all the custom-made hardware objects
         robot.init(hardwareMap);
         driveTrain.init(robot);
@@ -41,53 +41,51 @@ public class Artemis_Auto_Left extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // Create the position that the RoadRunner will be told the robot starts at
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(startPos);
 
-        // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
-        TrajectorySequence driveToCyclingPosLeft = drive.trajectorySequenceBuilder(startPos)
-                .forward(47)
-                .turn(Math.toRadians(105))
-                .back(4)
+        TrajectorySequence autoJustParkLeft = drive.trajectorySequenceBuilder(startPos)
+                .forward(36)
+                .strafeLeft(19)
+                .build();
+
+        TrajectorySequence autoJustParkRight = drive.trajectorySequenceBuilder(startPos)
+                .forward(36)
+                .strafeRight(19)
+                .back(1)
+                .build();
+
+        TrajectorySequence autoJustParkMiddle = drive.trajectorySequenceBuilder(startPos)
+                .forward(38)
                 .build();
 
         // Set-up the camera view
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Artemis_Webcam"), cameraMonitorViewId);
 
-        // Create an instance of the class to detect the AprilTags
         Artemis_AprilTag_Autonomous coneSleeveDetector = new Artemis_AprilTag_Autonomous(robot, telemetry, camera);
 
         // Get the desired parking location as a string
         String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
 
-        // Keep looking for a parking location either until one is found or the START button is pressed
         while (!opModeIsActive() && parkingLocation == "NOT FOUND") {
             parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
             telemetry.addData("Place to park", parkingLocation);
             telemetry.update();
         }
 
-        // Wait for the START button to be pressed
         waitForStart();
 
-        if (parkingLocation == "NOT FOUND") {
-            parkingLocation = "MIDDLE";
-        }
-
-        // Move the robot to the position where it can cycle cones
-        drive.followTrajectorySequence(driveToCyclingPosLeft);
-
-        // Start the deposit "High" scoring program
-        deposit.runDeposit(robot, 0, "High", telemetry);
-
-        // Continue the deposit "High" scoring program until it finishes
-        while (deposit.automationWasSet || deposit.zeroWasTargetted) {
-            deposit.runDeposit(robot, 0, "Update", telemetry);
+        if (parkingLocation == "LEFT") {
+            drive.followTrajectorySequence(autoJustParkLeft);
+        } else if (parkingLocation == "MIDDLE" || parkingLocation == "NOT FOUND") {
+            drive.followTrajectorySequence(autoJustParkMiddle);
+        } else if (parkingLocation == "RIGHT") {
+            drive.followTrajectorySequence(autoJustParkRight);
         }
 
         while (opModeIsActive()) {
+
 
         }
     }
