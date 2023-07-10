@@ -37,6 +37,9 @@ public class Artemis_Auto_Right extends LinearOpMode {
         intake.init(robot, telemetry);
         deposit.init(robot, telemetry);
 
+        robot.V4B_1.setPosition(intake.V4B_IdlePos);
+        robot.V4B_2.setPosition(intake.V4B_IdlePos);
+
         // Create RoadRunner objects
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -49,7 +52,7 @@ public class Artemis_Auto_Right extends LinearOpMode {
         TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
                 .forward(47)
                 .turn(Math.toRadians(-105))
-                .back(4)
+                .back(2)
                 .build();
 
         // Set-up the camera view
@@ -87,7 +90,21 @@ public class Artemis_Auto_Right extends LinearOpMode {
             deposit.runDeposit(robot, 0, "Update", telemetry);
         }
 
-        while (opModeIsActive()) {
+        boolean cycleRunning = false;
+        boolean cycleSlidesHaveReachedPos = false;
+
+
+        while(!cycleSlidesHaveReachedPos) {
+            intake.resetToHome(robot, deposit);
+            intake.runIntake(robot, intake.intakeCyclePos, telemetry, 1);
+
+
+            if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intake.intakeCyclePos, 10)) {
+                cycleSlidesHaveReachedPos = true;
+            }
+        }
+
+        while(opModeIsActive()) {
 
         }
     }

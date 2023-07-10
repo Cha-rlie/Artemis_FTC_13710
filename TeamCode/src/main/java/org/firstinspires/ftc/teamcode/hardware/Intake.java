@@ -109,6 +109,9 @@ public class Intake {
 
         cycleRunning = false;
 
+        robot.V4B_1.setPosition(V4B_TransferPos);
+        robot.V4B_2.setPosition(V4B_TransferPos);
+
     }
 
     public void changeClaw(RobotHardware robot) {
