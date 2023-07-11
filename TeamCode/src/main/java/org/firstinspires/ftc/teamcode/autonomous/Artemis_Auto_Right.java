@@ -111,6 +111,14 @@ public class Artemis_Auto_Right extends LinearOpMode {
         boolean cycleRunning = false;
         boolean cycleSlidesHaveReachedPos = false;
 
+        /* NEW CYCLING CODE
+        // Move the claw down ready to start cycling
+        robot.V4B_1.setPosition(intake.V4B_HomePos);
+        robot.V4B_2.setPosition(intake.V4B_HomePos);
+
+        // Cycle through the stack of cones
+        intake.newCycle(robot,deposit,intake,telemetry,gamepad2);*/
+
         // Move the robot to the correct parking position
         if (parkingLocation == "LEFT") {
             drive.followTrajectorySequence(driveToLeftParkingPosRightAuto);
@@ -120,7 +128,7 @@ public class Artemis_Auto_Right extends LinearOpMode {
             drive.followTrajectorySequence(driveToRightParkingPosRightAuto);
         }
 
-
+        // OLD CYCLING CODE
 //        while(!cycleSlidesHaveReachedPos) {
 //            robot.V4B_1.setPosition(intake.V4B_HomePos-0.08);
 //            robot.V4B_2.setPosition(intake.V4B_HomePos-0.08);

@@ -355,6 +355,125 @@ public class Intake {
         }
     }
 
+    public void newCycle (RobotHardware robot, Deposit deposit, Intake intake, Telemetry telemetry, Gamepad gamepad2) {
+
+        int cyclesLeft = 4;
+        boolean slidesAreExtended = false;
+        boolean V4B_AtConeGrabbingPos = false;
+        double V4B_GoneGrabbingPos;
+        boolean V4B_SafeToTransfer = false;
+        double V4B_ReadyToTransferPos;
+        boolean V4B_AtHomePos = false;
+
+        while (cyclesLeft > -1 && !gamepad2.guide) {
+
+            // Open the claw
+            robot.claw.setPosition(openClawPos);
+
+            // Position the V4B at the right angle to grab the current cone on the stack
+            V4B_GoneGrabbingPos = V4B_TransferPos-(0.5*cyclesLeft);
+            robot.V4B_1.setPosition(V4B_GoneGrabbingPos);
+            robot.V4B_2.setPosition(V4B_GoneGrabbingPos);
+
+            // Slightly change the V4B's target position until the desired position is reached
+            if(!V4B_AtConeGrabbingPos) {
+                if(robot.V4B_1.getPosition() > V4B_GoneGrabbingPos) {
+                    targetChange -= 0.0005;
+                } else if(robot.V4B_1.getPosition() < V4B_GoneGrabbingPos) {
+                    targetChange += 0.0005;
+                }
+
+                robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
+                robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
+
+                // Check if the V4B is now in the correct position
+                if (robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_GoneGrabbingPos, 0.01)) {
+                    V4B_AtConeGrabbingPos = true;
+                }
+
+            }
+
+            // Extend the intake outwards
+            if(!slidesAreExtended) {
+                intake.runIntake(robot, intake.intakeCyclePos, telemetry, 1);
+
+                // Check if the slides have reach extension
+                if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeCyclePos, 10)) {
+                    slidesAreExtended = true;
+                }
+            }
+
+            // Close the claw and grab the cone
+            robot.claw.setPosition(closedClawPos);
+
+            // Lift the V4B up so that the cone transfer program does not tip over the stack
+            V4B_ReadyToTransferPos = robot.V4B_1.getPosition() - 0.10;
+            robot.V4B_1.setPosition(V4B_ReadyToTransferPos);
+            robot.V4B_2.setPosition(V4B_ReadyToTransferPos);
+
+            // Slightly change the V4B's target position until the desired position is reached
+            if(!V4B_SafeToTransfer) {
+                if(robot.V4B_1.getPosition() > V4B_ReadyToTransferPos) {
+                    targetChange -= 0.0005;
+                } else if(robot.V4B_1.getPosition() < V4B_ReadyToTransferPos) {
+                    targetChange += 0.0005;
+                }
+
+                robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
+                robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
+
+                // Check if the V4B is now in the correct position
+                if (robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_ReadyToTransferPos, 0.01)) {
+                    V4B_SafeToTransfer = true;
+                }
+
+            }
+
+            // Start the cone transfer process
+            coneTransfer(robot, "Start", telemetry, deposit);
+
+            // Keep the cone transfer process running until it is complete
+            while (isConeBeingTransferred) {
+                coneTransfer(robot, "Update", telemetry, deposit);
+            }
+
+            // Move the claw out of the way of the deposit and ready to grab the next cone
+            robot.V4B_1.setPosition(V4B_HomePos);
+            robot.V4B_2.setPosition(V4B_HomePos);
+
+            // Slightly change the V4B's target position until the desired position is reached
+            if(!V4B_AtHomePos) {
+                if(robot.V4B_1.getPosition() > V4B_HomePos) {
+                    targetChange -= 0.0005;
+                } else if(robot.V4B_1.getPosition() < V4B_HomePos) {
+                    targetChange += 0.0005;
+                }
+
+                robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
+                robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
+
+                // Check if the V4B is now in the correct position
+                if (robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_HomePos, 0.01)) {
+                    V4B_AtHomePos = true;
+                }
+
+            }
+
+            // Start the deposit "High" scoring program
+            deposit.runDeposit(robot, 0, "High", telemetry);
+
+            // Continue the deposit "High" scoring program until it finishes
+            while (deposit.automationWasSet || deposit.zeroWasTargetted) {
+                deposit.runDeposit(robot, 0, "Update", telemetry);
+            }
+
+            // Decrease the amount of cycles left to run by one
+            cyclesLeft--;
+
+        }
+
+    }
+
     public void cycle(RobotHardware robot, Deposit deposit, Intake intake, Telemetry telemetry, Gamepad gamepad2) {
         if(!cycleRunning) {
             cycleRunning = true;
