@@ -50,9 +50,27 @@ public class Artemis_Auto_Right extends LinearOpMode {
 
         // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
         TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
-                .forward(47)
+                .forward(50)
                 .turn(Math.toRadians(-105))
+                //.back(2)
+                .build();
+
+        TrajectorySequence driveToLeftParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .turn(Math.toRadians(105))
                 .back(2)
+                .strafeLeft(21)
+                .build();
+
+        TrajectorySequence driveToMiddleParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .turn(Math.toRadians(105))
+                .back(2)
+                .build();
+
+        TrajectorySequence driveToRightParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .turn(Math.toRadians(105))
+                .back(2)
+                .strafeRight(20)
+                .back(1)
                 .build();
 
         // Set-up the camera view
@@ -93,16 +111,40 @@ public class Artemis_Auto_Right extends LinearOpMode {
         boolean cycleRunning = false;
         boolean cycleSlidesHaveReachedPos = false;
 
-
-        while(!cycleSlidesHaveReachedPos) {
-            intake.resetToHome(robot, deposit);
-            intake.runIntake(robot, intake.intakeCyclePos, telemetry, 1);
-
-
-            if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intake.intakeCyclePos, 10)) {
-                cycleSlidesHaveReachedPos = true;
-            }
+        // Move the robot to the correct parking position
+        if (parkingLocation == "LEFT") {
+            drive.followTrajectorySequence(driveToLeftParkingPosRightAuto);
+        } else if (parkingLocation == "MIDDLE" || parkingLocation == "NOT FOUND") {
+            drive.followTrajectorySequence(driveToMiddleParkingPosRightAuto);
+        } else if (parkingLocation == "RIGHT") {
+            drive.followTrajectorySequence(driveToRightParkingPosRightAuto);
         }
+
+
+//        while(!cycleSlidesHaveReachedPos) {
+//            robot.V4B_1.setPosition(intake.V4B_HomePos-0.08);
+//            robot.V4B_2.setPosition(intake.V4B_HomePos-0.08);
+//            robot.spinClaw.setPosition(intake.clawFowardPos);
+//
+//            intake.resetToHome(robot, deposit);
+//            robot.intakeLeft.setTargetPosition(intake.intakeCyclePos);
+//            robot.intakeRight.setTargetPosition(intake.intakeCyclePos);
+//            robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.intakeLeft.setPower(1);
+//            robot.intakeRight.setPower(1);
+//
+//            if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intake.intakeCyclePos, 10)) {
+//                cycleSlidesHaveReachedPos = true;
+//            }
+//        }
+//
+//        robot.claw.setPosition(intake.closedClawPos);
+//
+//        sleep(500);
+
+
+
 
         while(opModeIsActive()) {
 

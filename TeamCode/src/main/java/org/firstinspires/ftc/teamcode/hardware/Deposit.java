@@ -42,6 +42,26 @@ public class Deposit {
     }
 
     public void init(RobotHardware robot, Telemetry telemetry) {
+        // Vairables Reset ------------------------
+        boolean buttonReleased = true;
+        boolean latchState = false; // True = open
+
+        encoderError = 5;
+        max = 3000;
+        min = 0;
+        int highJunction = 2375;
+        int midJunction = 1600;
+
+        double latchOpen = 0.1;
+        double latchPrime = 0.5;
+        double latchClose = 0.7;
+
+        int automatedMoveTargetPosition;
+        boolean automationWasSet;
+        boolean zeroWasTargetted;
+
+
+
         double current = 0;
         controlLatch(robot, "Close");
 

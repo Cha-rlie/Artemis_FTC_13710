@@ -20,6 +20,7 @@ public class Intake {
     private static Intake instance = null;
     public boolean enabled;
     ElapsedTime mStateTime = new ElapsedTime();
+    ElapsedTime dStateTime = new ElapsedTime();
 
     // Variable to keep track of whether or not a cone is being transferred
     public boolean isConeBeingTransferred = false;
@@ -33,16 +34,17 @@ public class Intake {
     public boolean buttonXReleased = true;
     public boolean movingToGround = false; // Has the reset home function been called
     public boolean movingToIdle = false;
+    public boolean delayedBool;
 
     // Transfer stoof
     public double V4B_HomePos = 0.55; // Position where V4B is ready for intaking
     public double V4B_GentleHomePos = 0.53; // Position where V4B is ready for intaking
     public double V4B_TransferPos = 0.31; // Position where V4B is ready for transfer
     public double V4B_IdlePos = 0.377; // Position where the claw is in dimension and out of the way (for general driving)
-    public int intakeTransferPos = 0;
+    public int intakeTransferPos = -150;
     public int intakeCyclePos = -1420;
     public int depositTransferPos = 380;
-    public int depositMidTransferPos = 150;
+    public int depositMidTransferPos = 200;
 
     double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
     double rotateClaw_Ground = 0.5; // Position where RotateClaw is ready for ground intaking
@@ -59,10 +61,12 @@ public class Intake {
     public int intakeHome = 0; // Fully contracted position
     public int intakeOut = -3000 ; // Fully extended position -2000
     double powerValue;
+    boolean dStateTimeReset;
 
     public boolean SlidePositionReached;
     boolean V4BPositionReached;
     boolean DepositReached;
+    boolean DepositReached2;
     public boolean cycleRunning = false;
     public boolean cycleSlidesHaveReachedPos = false;
     double targetChange;
@@ -77,6 +81,61 @@ public class Intake {
     }
 
     public void init(RobotHardware robot, Telemetry telemetry) {
+        // ----------------------------------- INIT VARIABLES
+        ElapsedTime mStateTime = new ElapsedTime();
+        ElapsedTime dStateTime = new ElapsedTime();
+
+        // Variable to keep track of whether or not a cone is being transferred
+        boolean isConeBeingTransferred = false;
+        boolean cycleTransferCompete = false;
+        boolean transferRunning = false;
+
+        boolean lowJunctionPosition = false; // Is the Claw facing the ground?
+        boolean clawBackwards = false; // Is the Claw facing backwards?
+        boolean clawState = true; // True = open
+        boolean buttonAReleased = true;
+        boolean buttonXReleased = true;
+        boolean movingToGround = false; // Has the reset home function been called
+        boolean movingToIdle = false;
+        boolean delayedBool;
+
+        // Transfer stoof
+        double V4B_HomePos = 0.55; // Position where V4B is ready for intaking
+        double V4B_GentleHomePos = 0.53; // Position where V4B is ready for intaking
+        double V4B_TransferPos = 0.31; // Position where V4B is ready for transfer
+        double V4B_IdlePos = 0.377; // Position where the claw is in dimension and out of the way (for general driving)
+        int intakeTransferPos = -150;
+        int intakeCyclePos = -1420;
+        int depositTransferPos = 380;
+        int depositMidTransferPos = 200;
+
+        double rotateClaw_HomePos = 0.7379; // Position where RotateClaw is ready for intaking
+        double rotateClaw_Ground = 0.5; // Position where RotateClaw is ready for ground intaking
+        double increment = 0.1;
+
+        double closedClawPos = 0.32; // Position where claw is closed
+        double openClawPos = 0.55; // Position where claw is open
+        double midOpenClawPos = 0.45; // Position where claw is open enough to release cone during transfer
+        boolean restrictClawMovement = false;
+
+        double clawFowardPos = 0.712;
+        double clawBackwardsPos = 0.090;
+
+        int intakeHome = 0; // Fully contracted position
+        int intakeOut = -3000 ; // Fully extended position -2000
+        double powerValue;
+        boolean dStateTimeReset;
+        boolean SlidePositionReached;
+        boolean V4BPositionReached;
+        boolean DepositReached;
+        boolean DepositReached2;
+        boolean cycleRunning = false;
+        boolean cycleSlidesHaveReachedPos = false;
+        double targetChange;
+        boolean isRotatedBack = false;
+
+
+
         robot.claw.setPosition(closedClawPos);
 
         mStateTime.reset();
@@ -84,8 +143,8 @@ public class Intake {
 
         }
 
-        robot.V4B_1.setPosition(V4B_IdlePos);
-        robot.V4B_2.setPosition(V4B_IdlePos);
+        robot.V4B_1.setPosition(V4B_TransferPos);
+        robot.V4B_2.setPosition(V4B_TransferPos);
 
 
         robot.spinClaw.setPosition(clawFowardPos);
@@ -108,9 +167,6 @@ public class Intake {
         robot.intakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         cycleRunning = false;
-
-        robot.V4B_1.setPosition(V4B_TransferPos);
-        robot.V4B_2.setPosition(V4B_TransferPos);
 
     }
 
@@ -198,6 +254,7 @@ public class Intake {
         if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeTransferPos, 10)) {SlidePositionReached = true;}
         if (robot.withinUncertainty(robot.V4B_1.getPosition(), V4B_TransferPos, 0.01)) {V4BPositionReached = true;}
         if (robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), depositTransferPos, 10)) {DepositReached = true;}
+        if (robot.withinUncertainty(robot.depositLeft.getCurrentPosition(), depositMidTransferPos, 10)) {DepositReached2 = true;}
 
         // Do things just once at the beginning
         if (mode == "Start" && !transferRunning) {
@@ -207,7 +264,10 @@ public class Intake {
             SlidePositionReached = false; // Holds whether desired position for intake slides has been reached
             V4BPositionReached = false; // Holds whether desired position for v4b has been reached
             DepositReached = false;
+            DepositReached2 = false;
             isRotatedBack = false;
+            delayedBool = false;
+            dStateTimeReset = false;
             targetChange = 0;
 
             deposit.controlLatch(robot, "Prime");
@@ -222,7 +282,7 @@ public class Intake {
             robot.spinClaw.setPosition(clawBackwardsPos);
         }
 
-        if(SlidePositionReached) {
+        if(SlidePositionReached) { // Put this into cycle function
             robot.intakeLeft.setTargetPosition(intakeTransferPos);
             robot.intakeRight.setTargetPosition(intakeTransferPos);
             robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -253,24 +313,34 @@ public class Intake {
 //            }
 //        }
 
-        if (SlidePositionReached && V4BPositionReached && DepositReached) {
+        if(SlidePositionReached && V4BPositionReached && DepositReached && !delayedBool) {
             deposit.controlLatch(robot, "Close");
+            dStateTime.reset();
+            dStateTimeReset = true;
+            delayedBool = true;
+        }
+
+        telemetry.addData("dStateTime: ", dStateTime.seconds());
+        telemetry.addData("delayedBool: ", delayedBool);
+
+        if (dStateTime.seconds() > 0.5 && delayedBool) {
             robot.claw.setPosition(midOpenClawPos);
         }
 
-        if(!SlidePositionReached && !V4BPositionReached) {
+        if(!DepositReached2) {
             deposit.runDeposit(robot, depositMidTransferPos, "Manual", telemetry);
             deposit.heldPosition = depositMidTransferPos;
         }
 
-
-        if (SlidePositionReached && V4BPositionReached) {
+        if (DepositReached2 && SlidePositionReached && V4BPositionReached) {
             deposit.runDeposit(robot, depositTransferPos, "Manual", telemetry);
             deposit.heldPosition = depositTransferPos;
         }
 
 
-        if(SlidePositionReached && V4BPositionReached && DepositReached && deposit.latchMode(robot) == "Close") {
+        if(dStateTime.seconds() > 0.5 && SlidePositionReached && V4BPositionReached && DepositReached && delayedBool) {
+            robot.claw.setPosition(midOpenClawPos);
+            delayedBool = false;
             if(cycleRunning) {
                 resetToHome(robot, deposit);
             } else {
