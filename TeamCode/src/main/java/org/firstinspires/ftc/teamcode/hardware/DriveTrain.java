@@ -15,6 +15,7 @@ public class DriveTrain {
     // Drivetrain variables to manage and control instances of the class
     private static DriveTrain instance = null;
     public boolean enabled;
+    public double botHeading;
 
     public void init(RobotHardware robot) {
         // Retrieve the IMU from the hardware map

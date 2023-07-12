@@ -50,7 +50,7 @@ public class Artemis_Auto_Right extends LinearOpMode {
 
         // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
         TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
-                .forward(50)
+                .forward(53)
                 .turn(Math.toRadians(-105))
                 //.back(2)
                 .build();
@@ -58,19 +58,19 @@ public class Artemis_Auto_Right extends LinearOpMode {
         TrajectorySequence driveToLeftParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
                 .turn(Math.toRadians(105))
                 .back(2)
-                .strafeLeft(21)
+                .strafeLeft(24)
                 .build();
 
         TrajectorySequence driveToMiddleParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
                 .turn(Math.toRadians(105))
-                .back(2)
+                .back(1)
                 .build();
 
         TrajectorySequence driveToRightParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
                 .turn(Math.toRadians(105))
                 .back(2)
-                .strafeRight(20)
-                .back(1)
+                .strafeRight(22)
+                //.back(1)
                 .build();
 
         // Set-up the camera view
@@ -111,9 +111,9 @@ public class Artemis_Auto_Right extends LinearOpMode {
         boolean cycleRunning = false;
         boolean cycleSlidesHaveReachedPos = false;
 
-        /* NEW CYCLING CODE
+        // NEW CYCLING CODE
         // Move the claw down ready to start cycling
-        robot.V4B_1.setPosition(intake.V4B_HomePos);
+        /*robot.V4B_1.setPosition(intake.V4B_HomePos);
         robot.V4B_2.setPosition(intake.V4B_HomePos);
 
         // Cycle through the stack of cones
@@ -155,7 +155,7 @@ public class Artemis_Auto_Right extends LinearOpMode {
 
 
         while(opModeIsActive()) {
-
+            telemetry.addData("Heading: ", driveTrain.botHeading);
         }
     }
 }

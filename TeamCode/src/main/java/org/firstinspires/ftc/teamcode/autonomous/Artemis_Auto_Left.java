@@ -50,23 +50,27 @@ public class Artemis_Auto_Left extends LinearOpMode {
 
         // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
         TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
-                .forward(50)
+                .forward(65)
                 .turn(Math.toRadians(105))
-                //.back(2)
+                .back(1)
                 .build();
 
         TrajectorySequence driveToLeftParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .forward(1)
                 .turn(Math.toRadians(-105))
                 .back(2)
-                .strafeLeft(21)
+                .strafeLeft(25)
+                //.back(1)
                 .build();
 
         TrajectorySequence driveToMiddleParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .forward(1)
                 .turn(Math.toRadians(-105))
-                .back(2)
+                .back(1)
                 .build();
 
         TrajectorySequence driveToRightParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
+                .forward(1)
                 .turn(Math.toRadians(-105))
                 .back(2)
                 .strafeRight(20)

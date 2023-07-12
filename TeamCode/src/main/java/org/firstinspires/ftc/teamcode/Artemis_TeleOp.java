@@ -9,9 +9,11 @@ import org.firstinspires.ftc.teamcode.hardware.Deposit;
 
 // Import the necessary FTC modules and classes
 //import com.google.android.libraries.play.games.inputmapping.Input;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
@@ -222,7 +224,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 
             // telemetry.addData("Claw Distance: ", robot.clawDistance.getDistance(DistanceUnit.MM));
 
-//            telemetry.addData("Increment Value: ", intake.increment);
+            telemetry.addData("Increment Value: ", intake.increment);
 
 //            telemetry.addData("Motion Profiling Intake", intake.intakeMotionProfile(robot, robot.valueOff(robot.intakeLeft.getCurrentPosition(), intake.intakeOut)));
 //            telemetry.addData("Closeness Value", robot.valueOff(robot.intakeLeft.getCurrentPosition(), intake.intakeOut));

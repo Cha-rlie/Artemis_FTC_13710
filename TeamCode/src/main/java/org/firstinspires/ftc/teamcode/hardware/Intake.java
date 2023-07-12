@@ -311,10 +311,10 @@ public class Intake {
 //                isRotatedBack = true;
 //                increment -= 0.2;
 //            }
+//            }
 //        }
 
         if(SlidePositionReached && V4BPositionReached && DepositReached && !delayedBool) {
-            deposit.controlLatch(robot, "Close");
             dStateTime.reset();
             dStateTimeReset = true;
             delayedBool = true;
@@ -323,7 +323,12 @@ public class Intake {
         telemetry.addData("dStateTime: ", dStateTime.seconds());
         telemetry.addData("delayedBool: ", delayedBool);
 
+        if(dStateTime.seconds() > 0.2 && delayedBool) {
+            deposit.controlLatch(robot, "Close");
+        }
+
         if (dStateTime.seconds() > 0.5 && delayedBool) {
+            deposit.controlLatch(robot, "Close");
             robot.claw.setPosition(midOpenClawPos);
         }
 
@@ -392,7 +397,7 @@ public class Intake {
                 }
 
             }
-
+            /*
             // Extend the intake outwards
             if(!slidesAreExtended) {
                 intake.runIntake(robot, intake.intakeCyclePos, telemetry, 1);
@@ -469,7 +474,7 @@ public class Intake {
 
             // Decrease the amount of cycles left to run by one
             cyclesLeft--;
-
+            */
         }
 
     }

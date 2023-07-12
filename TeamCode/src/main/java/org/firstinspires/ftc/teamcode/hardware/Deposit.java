@@ -18,6 +18,7 @@ public class Deposit {
     public int heldPosition = 0;
     public boolean buttonReleased = true;
     boolean latchState = false; // True = open
+    double current;
 
     public int encoderError = 5;
     public int max = 3000;
@@ -27,11 +28,12 @@ public class Deposit {
 
     double latchOpen = 0.1;
     double latchPrime = 0.5;
-    double latchClose = 0.7;
+    double latchClose = 0.68;
 
     public int automatedMoveTargetPosition;
     public boolean automationWasSet;
     public boolean zeroWasTargetted;
+    public String automationPoleTarget;
 
     public static Deposit getInstance() {
         if (instance == null) {
@@ -82,6 +84,14 @@ public class Deposit {
     }
 
     public void runDeposit(RobotHardware robot, int targetPosition, String mode, Telemetry telemetry) {
+
+        // Safety check to halt the automatic process if the current charge is too high (indicating the deposit is stuck on something)
+        current = (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2;
+        if(current > 2 && zeroWasTargetted && robot.depositLeft.getCurrentPosition() < highJunction-200 && automationPoleTarget == "High") {
+            zeroWasTargetted = false;
+            mode = "Manual";
+        }
+
         if (mode == "Manual") {
             // Stop the automation
             automationWasSet = false;
@@ -99,12 +109,12 @@ public class Deposit {
             heldPosition = 0;
 
             // Change the variable to demonstrate that an automation command was just set
-            if (mode == "High" || mode == "Medium") {automationWasSet = true;}
+            if (mode == "High" || mode == "Medium") {automationWasSet = true; controlLatch(robot, "Close");}
             // Set the desired automated values
             if (mode == "High") {
-                automatedMoveTargetPosition = highJunction; controlLatch(robot, "Close");}
+                automatedMoveTargetPosition = highJunction; automationPoleTarget = "High";}
             else if (mode == "Medium") {
-                automatedMoveTargetPosition = midJunction; controlLatch(robot, "Close");}
+                automatedMoveTargetPosition = midJunction; automationPoleTarget = "Medium";}
 
             robot.depositLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.depositRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
