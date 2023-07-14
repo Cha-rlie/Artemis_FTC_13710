@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.autonomous.Artemis_Auto_Right;
 
 import java.lang.Math;
 
@@ -19,6 +20,7 @@ public class Deposit {
     public boolean buttonReleased = true;
     boolean latchState = false; // True = open
     double current;
+    public boolean failSafeActiviated = false;
 
     public int encoderError = 5;
     public int max = 3000;
@@ -85,12 +87,13 @@ public class Deposit {
 
     public void runDeposit(RobotHardware robot, int targetPosition, String mode, Telemetry telemetry) {
 
-        // Safety check to halt the automatic process if the current charge is too high (indicating the deposit is stuck on something)
-        current = (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2;
-        if(current > 2 && zeroWasTargetted && robot.depositLeft.getCurrentPosition() < highJunction-200 && automationPoleTarget == "High") {
-            zeroWasTargetted = false;
-            mode = "Manual";
-        }
+//        // Safety check to halt the automatic process if the current charge is too high (indicating the deposit is stuck on something)
+//        current = (robot.depositLeft.getCurrent(CurrentUnit.AMPS)+robot.depositRight.getCurrent(CurrentUnit.AMPS))/2;
+//        if(current > 2 && zeroWasTargetted && robot.depositLeft.getCurrentPosition() < highJunction-200 && automationPoleTarget == "High") {
+//            zeroWasTargetted = false;
+//            mode = "Manual";
+//            failSafeActiviated = true;
+//        }
 
         if (mode == "Manual") {
             // Stop the automation

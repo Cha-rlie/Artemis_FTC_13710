@@ -342,7 +342,6 @@ public class Intake {
             deposit.heldPosition = depositTransferPos;
         }
 
-
         if(dStateTime.seconds() > 0.5 && SlidePositionReached && V4BPositionReached && DepositReached && delayedBool) {
             robot.claw.setPosition(midOpenClawPos);
             delayedBool = false;

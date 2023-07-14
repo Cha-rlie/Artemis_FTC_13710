@@ -36,8 +36,7 @@ public class RobotHardware {
 
     public IMU imu;
 
-    public DistanceSensor clawDistance;
-
+    public DistanceSensor distanceSensor;
 
     private static RobotHardware instance = null;
     public boolean enabled;
@@ -84,7 +83,7 @@ public class RobotHardware {
 
         imu = hardwareMap.get(IMU.class, "imu");
 
-        clawDistance = hardwareMap.get(DistanceSensor.class, "clawDistance");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "clawDistance");
 
         this.enabled = true;
     }

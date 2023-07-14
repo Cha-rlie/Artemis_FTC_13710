@@ -30,7 +30,7 @@ public class Artemis_Auto_Left extends LinearOpMode {
     private Deposit deposit = Deposit.getInstance();
 
     @Override
-    public void runOpMode() throws InterruptedException{
+    public void runOpMode() throws InterruptedException {
         // Initialise all the custom-made hardware objects
         robot.init(hardwareMap);
         driveTrain.init(robot);
@@ -50,30 +50,27 @@ public class Artemis_Auto_Left extends LinearOpMode {
 
         // Create the RoadRunner TrajectorySequence that will get the robot to the cycling position
         TrajectorySequence driveToCyclingPosRight = drive.trajectorySequenceBuilder(startPos)
-                .forward(65)
-                .turn(Math.toRadians(105))
-                .back(1)
+                .forward(51)
+                .turn(Math.toRadians(98))
+                //.back(2)
                 .build();
 
         TrajectorySequence driveToLeftParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
-                .forward(1)
-                .turn(Math.toRadians(-105))
+                .turn(Math.toRadians(-98))
                 .back(2)
-                .strafeLeft(25)
-                //.back(1)
+                .strafeLeft(24)
+                //.back(2)
                 .build();
 
         TrajectorySequence driveToMiddleParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
-                .forward(1)
-                .turn(Math.toRadians(-105))
-                .back(1)
+                .turn(Math.toRadians(-98))
+                .back(2)
                 .build();
 
         TrajectorySequence driveToRightParkingPosRightAuto = drive.trajectorySequenceBuilder(driveToCyclingPosRight.end())
-                .forward(1)
-                .turn(Math.toRadians(-105))
+                .turn(Math.toRadians(-98))
                 .back(2)
-                .strafeRight(20)
+                .strafeRight(22)
                 .back(1)
                 .build();
 
@@ -88,8 +85,9 @@ public class Artemis_Auto_Left extends LinearOpMode {
         String parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
 
         // Keep looking for a parking location either until one is found or the START button is pressed
-        while (!opModeIsActive() && parkingLocation == "NOT FOUND") {
+        while (opModeInInit() && !isStopRequested() && parkingLocation == "NOT FOUND") {
             parkingLocation = coneSleeveDetector.getDetectedSide(telemetry);
+            opModeIsActive();
             telemetry.addData("Place to park", parkingLocation);
             telemetry.update();
         }
@@ -104,24 +102,8 @@ public class Artemis_Auto_Left extends LinearOpMode {
         // Move the robot to the position where it can cycle cones
         drive.followTrajectorySequence(driveToCyclingPosRight);
 
-        // Start the deposit "High" scoring program
-        deposit.runDeposit(robot, 0, "High", telemetry);
 
-        // Continue the deposit "High" scoring program until it finishes
-        while (deposit.automationWasSet || deposit.zeroWasTargetted) {
-            deposit.runDeposit(robot, 0, "Update", telemetry);
-        }
 
-        boolean cycleRunning = false;
-        boolean cycleSlidesHaveReachedPos = false;
-
-        /* NEW CYCLING CODE
-        // Move the claw down ready to start cycling
-        robot.V4B_1.setPosition(intake.V4B_HomePos);
-        robot.V4B_2.setPosition(intake.V4B_HomePos);
-
-        // Cycle through the stack of cones
-        intake.newCycle(robot,deposit,intake,telemetry,gamepad2);*/
 
         // Move the robot to the correct parking position
         if (parkingLocation == "LEFT") {
@@ -132,34 +114,5 @@ public class Artemis_Auto_Left extends LinearOpMode {
             drive.followTrajectorySequence(driveToRightParkingPosRightAuto);
         }
 
-        // OLD CYCLING CODE
-//        while(!cycleSlidesHaveReachedPos) {
-//            robot.V4B_1.setPosition(intake.V4B_HomePos-0.08);
-//            robot.V4B_2.setPosition(intake.V4B_HomePos-0.08);
-//            robot.spinClaw.setPosition(intake.clawFowardPos);
-//
-//            intake.resetToHome(robot, deposit);
-//            robot.intakeLeft.setTargetPosition(intake.intakeCyclePos);
-//            robot.intakeRight.setTargetPosition(intake.intakeCyclePos);
-//            robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.intakeLeft.setPower(1);
-//            robot.intakeRight.setPower(1);
-//
-//            if(robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intake.intakeCyclePos, 10)) {
-//                cycleSlidesHaveReachedPos = true;
-//            }
-//        }
-//
-//        robot.claw.setPosition(intake.closedClawPos);
-//
-//        sleep(500);
-
-
-
-
-        while(opModeIsActive()) {
-
         }
     }
-}

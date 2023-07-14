@@ -234,7 +234,7 @@ public class Artemis_TeleOp extends LinearOpMode {
 //            telemetry.addData("TransferRunning: ", intake.transferRunning);
 //            telemetry.addData("IsConeBeingTransferred", intake.isConeBeingTransferred);
 
-//            telemetry.addData("V4B: ", robot.V4B_1.getPosition());
+            telemetry.addData("V4B: ", robot.V4B_1.getPosition());
 //            telemetry.addData("RotateClaw: ", robot.rotateClaw.getPosition());
 //            telemetry.addData("Claw: ", robot.claw.getPosition());
 //            telemetry.addData("SpinClaw: ", robot.spinClaw.getPosition());
