@@ -45,6 +45,9 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
+
+            telemetry.addData("Distance", robot.distanceSensor.getDistance(DistanceUnit.CM));
+
             driveTrain.runDriveTrain(robot, telemetry, this.gamepad1);
 
 
@@ -88,13 +91,16 @@ public class Artemis_TeleOp extends LinearOpMode {
             } else {intake.buttonXReleased = true;}
 
             // Automatically move rotate claw with v4b movement
-            telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
+            telemetry.addData("Rotation Encoder: ", intake.updateRotateClaw(robot, intake.increment));
+            telemetry.addData("Raw Encoder", robot.rearRight.getCurrentPosition());
 
             // Set the claw to home position
             if(this.gamepad2.y) {
                 intake.increment = intake.resetToHome(robot, deposit);
             }
 
+
+            // this is saskias contribution to the code. i can't code i am just typing so it looks like i am doing work - saskia 2023
 
             // Manual movement of the rotate claw servo
             if(!intake.isConeBeingTransferred && this.gamepad2.left_bumper && this.gamepad2.right_bumper) {
@@ -157,14 +163,6 @@ public class Artemis_TeleOp extends LinearOpMode {
                     robot.claw.setPosition(intake.closedClawPos);
                 }
 
-                if(robot.V4B_1.getPosition() > intake.V4B_TransferPos+0.1) {
-                    if(intake.cycleRunning && intake.cycleTransferCompete) {
-                        deposit.runDeposit(robot, 0, "High", telemetry);
-                        intake.cycleRunning = false;
-                        intake.cycleTransferCompete = false;
-                        intake.cycle(robot, deposit, intake, telemetry, this.gamepad2);
-                    }
-                }
                 if(robot.V4B_1.getPosition() > intake.V4B_HomePos) {
                     intake.movingToGround = false;
                     robot.V4B_1.setPosition(intake.V4B_HomePos);

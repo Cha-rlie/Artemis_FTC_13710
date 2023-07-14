@@ -145,15 +145,11 @@ public class Artemis_Auto_Right extends LinearOpMode {
                 robot.intakeLeft.setPower(1);
                 robot.intakeRight.setPower(1);
 
-                telemetry.addData("Distance",robot.distanceSensor.getDistance(DistanceUnit.CM));
-                telemetry.update();
-
                 if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeAutoCycle, 10)) {
                     cycleSlidesHaveReachedPos = true;
-                } else if (robot.distanceSensor.getDistance(DistanceUnit.CM) < 2) {
-                    robot.intakeLeft.setPower(0);
-                    robot.intakeRight.setPower(0);
-                }
+                } /*else if (((robot.distanceSensor.getDistance(DistanceUnit.CM) < 2)) && (Math.abs(robot.intakeLeft.getCurrentPosition()-intakeAutoCycle) < 20)) {
+                    cycleSlidesHaveReachedPos = true;
+                }*/
 
             }
 
@@ -205,14 +201,6 @@ public class Artemis_Auto_Right extends LinearOpMode {
                     robot.claw.setPosition(intake.closedClawPos);
                 }
 
-                if (robot.V4B_1.getPosition() > intake.V4B_TransferPos + 0.1) {
-                    if (intake.cycleRunning && intake.cycleTransferCompete) {
-                        deposit.runDeposit(robot, 0, "High", telemetry);
-                        intake.cycleRunning = false;
-                        intake.cycleTransferCompete = false;
-                        intake.cycle(robot, deposit, intake, telemetry, this.gamepad2);
-                    }
-                }
                 if (robot.V4B_1.getPosition() > i) {
                     intake.movingToGround = false;
                     robot.V4B_1.setPosition(i);

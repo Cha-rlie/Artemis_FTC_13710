@@ -39,9 +39,9 @@ public class Intake {
     // Transfer stoof
     public double V4B_HomePos = 0.55; // Position where V4B is ready for intaking
     public double V4B_GentleHomePos = 0.53; // Position where V4B is ready for intaking
-    public double V4B_TransferPos = 0.31; // Position where V4B is ready for transfer
+    public double V4B_TransferPos = 0.29; // Position where V4B is ready for transfer
     public double V4B_IdlePos = 0.377; // Position where the claw is in dimension and out of the way (for general driving)
-    public int intakeTransferPos = -150;
+    public int intakeTransferPos = -147;
     public int intakeCyclePos = -1420;
     public int depositTransferPos = 380;
     public int depositMidTransferPos = 200;
@@ -191,10 +191,10 @@ public class Intake {
         if (buttonXReleased) {
             buttonXReleased = false;
             if(!lowJunctionPosition) {
-                increment = increment - 0.25;
+                increment = increment + 0.25;
                 lowJunctionPosition = true;
             } else if(lowJunctionPosition) {
-                increment = increment + 0.25;
+                increment = increment - 0.25;
                 lowJunctionPosition = false;
             }
         }
@@ -275,7 +275,7 @@ public class Intake {
         }
 
         if (!SlidePositionReached) {
-            runIntake(robot, intakeTransferPos, telemetry, 1);
+            runIntake(robot, intakeTransferPos-200, telemetry, 1);
         }
 
         if(robot.V4B_1.getPosition() < V4B_HomePos - 0.1) {
