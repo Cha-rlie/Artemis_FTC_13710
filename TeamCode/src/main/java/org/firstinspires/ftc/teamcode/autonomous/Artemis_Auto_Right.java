@@ -109,7 +109,7 @@ public class Artemis_Auto_Right extends LinearOpMode {
         }
 
         // Move the robot to the position where it can cycle cones
-        //drive.followTrajectorySequence(driveToCyclingPosRight);
+        drive.followTrajectorySequence(driveToCyclingPosRight);
 
         // Start the deposit "High" scoring program
         deposit.runDeposit(robot, 0, "High", telemetry);
@@ -117,137 +117,137 @@ public class Artemis_Auto_Right extends LinearOpMode {
         while (deposit.automationWasSet || deposit.zeroWasTargetted) {
             deposit.runDeposit(robot, 0, "Update", telemetry);
         }
+//
+//        double stackHeight = 0.08;
+//        double i = intake.V4B_HomePos - stackHeight;
+//        int intakeAutoCycle = -2550;
+//        int cycleNumber = 3;
+//
+//        for (int j = 0; j < cycleNumber; j++) {
+//            if(deposit.failSafeActiviated) {
+//                break;
+//            }
+//            i = i + (stackHeight / 5);
+//            intake.increment = 0.1;
+//            boolean cycleSlidesHaveReachedPos = false;
+//
+//            while (!cycleSlidesHaveReachedPos) {
+//                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
+//                robot.claw.setPosition(intake.openClawPos);
+//                robot.V4B_1.setPosition(i);
+//                robot.V4B_2.setPosition(i);
+//                robot.spinClaw.setPosition(intake.clawFowardPos);
+//
+//                robot.intakeLeft.setTargetPosition(intakeAutoCycle);
+//                robot.intakeRight.setTargetPosition(intakeAutoCycle);
+//                robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                robot.intakeLeft.setPower(1);
+//                robot.intakeRight.setPower(1);
+//
+//                if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeAutoCycle, 10)) {
+//                    cycleSlidesHaveReachedPos = true;
+//                } /*else if (((robot.distanceSensor.getDistance(DistanceUnit.CM) < 2)) && (Math.abs(robot.intakeLeft.getCurrentPosition()-intakeAutoCycle) < 20)) {
+//                    cycleSlidesHaveReachedPos = true;
+//                }*/
+//
+//            }
+//
+//            robot.claw.setPosition(intake.closedClawPos);
+//            boolean adjustmentIntake = false;
+//            int adjustmentIncrement = 200;
+//
+//            sleep(300);
+//
+//            while (!adjustmentIntake) {
+//                robot.V4B_1.setPosition(intake.V4B_HomePos - 0.2);
+//                robot.V4B_2.setPosition(intake.V4B_HomePos - 0.2);
+//                robot.intakeLeft.setTargetPosition(intakeAutoCycle - adjustmentIncrement);
+//                robot.intakeRight.setTargetPosition(intakeAutoCycle - adjustmentIncrement);
+//                robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                robot.intakeLeft.setPower(1);
+//                robot.intakeRight.setPower(1);
+//
+//                if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeAutoCycle - adjustmentIncrement, 10)) {
+//                    adjustmentIntake = true;
+//                }
+//            }
+//
+//
+//            sleep(200);
+//
+//            intake.coneTransfer(robot, "Start", telemetry, deposit);
+//            intake.isConeBeingTransferred = true;
+//
+//            while (intake.isConeBeingTransferred) {
+//                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
+//                intake.isConeBeingTransferred = intake.coneTransfer(robot, "Update", telemetry, deposit);
+//            }
+//
+//            intake.movingToGround = true;
+//            double targetChange = 0;
+//
+//            sleep(300);
+//
+//            while (intake.movingToGround) {
+//                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
+//                intake.transferRunning = false;
+//                intake.isConeBeingTransferred = false;
+//
+//                targetChange += 0.0008;
+//
+//                if (robot.V4B_1.getPosition() > intake.V4B_TransferPos + 0.05) {
+//                    robot.claw.setPosition(intake.closedClawPos);
+//                }
+//
+//                if (robot.V4B_1.getPosition() > i) {
+//                    intake.movingToGround = false;
+//                    robot.V4B_1.setPosition(i);
+//                    robot.V4B_2.setPosition(i);
+//                    robot.claw.setPosition(intake.openClawPos);
+//                    robot.spinClaw.setPosition(intake.clawFowardPos);
+//                    targetChange = 0;
+//                } else {
+//                    robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
+//                    robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
+//                }
+//            }
+//
+//
+//            sleep(300);
+//
+//            // Start the deposit "High" scoring program
+//            deposit.runDeposit(robot, 0, "High", telemetry);
+//
+//            while (deposit.automationWasSet || deposit.zeroWasTargetted) {
+//                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
+//                deposit.runDeposit(robot, 0, "Update", telemetry);
+//
+//                if (!(j == cycleNumber-1)) {
+//                    // Run to mid position
+//                    robot.intakeLeft.setTargetPosition(intakeAutoCycle + 300);
+//                    robot.intakeRight.setTargetPosition(intakeAutoCycle + 300);
+//                    robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    robot.intakeLeft.setPower(1);
+//                    robot.intakeRight.setPower(1);
+//                } else if (j == cycleNumber-1) {
+//                    robot.V4B_1.setPosition(intake.V4B_IdlePos);
+//                    robot.V4B_2.setPosition(intake.V4B_IdlePos);
+//                }
+//            }
+//        }
 
-        double stackHeight = 0.08;
-        double i = intake.V4B_HomePos - stackHeight;
-        int intakeAutoCycle = -2550;
-        int cycleNumber = 3;
-
-        for (int j = 0; j < cycleNumber; j++) {
-            if(deposit.failSafeActiviated) {
-                break;
-            }
-            i = i + (stackHeight / 5);
-            intake.increment = 0.1;
-            boolean cycleSlidesHaveReachedPos = false;
-
-            while (!cycleSlidesHaveReachedPos) {
-                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
-                robot.claw.setPosition(intake.openClawPos);
-                robot.V4B_1.setPosition(i);
-                robot.V4B_2.setPosition(i);
-                robot.spinClaw.setPosition(intake.clawFowardPos);
-
-                robot.intakeLeft.setTargetPosition(intakeAutoCycle);
-                robot.intakeRight.setTargetPosition(intakeAutoCycle);
-                robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.intakeLeft.setPower(1);
-                robot.intakeRight.setPower(1);
-
-                if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeAutoCycle, 10)) {
-                    cycleSlidesHaveReachedPos = true;
-                } /*else if (((robot.distanceSensor.getDistance(DistanceUnit.CM) < 2)) && (Math.abs(robot.intakeLeft.getCurrentPosition()-intakeAutoCycle) < 20)) {
-                    cycleSlidesHaveReachedPos = true;
-                }*/
-
-            }
-
-            robot.claw.setPosition(intake.closedClawPos);
-            boolean adjustmentIntake = false;
-            int adjustmentIncrement = 200;
-
-            sleep(300);
-
-            while (!adjustmentIntake) {
-                robot.V4B_1.setPosition(intake.V4B_HomePos - 0.2);
-                robot.V4B_2.setPosition(intake.V4B_HomePos - 0.2);
-                robot.intakeLeft.setTargetPosition(intakeAutoCycle - adjustmentIncrement);
-                robot.intakeRight.setTargetPosition(intakeAutoCycle - adjustmentIncrement);
-                robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.intakeLeft.setPower(1);
-                robot.intakeRight.setPower(1);
-
-                if (robot.withinUncertainty(robot.intakeLeft.getCurrentPosition(), intakeAutoCycle - adjustmentIncrement, 10)) {
-                    adjustmentIntake = true;
-                }
-            }
-
-
-            sleep(200);
-
-            intake.coneTransfer(robot, "Start", telemetry, deposit);
-            intake.isConeBeingTransferred = true;
-
-            while (intake.isConeBeingTransferred) {
-                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
-                intake.isConeBeingTransferred = intake.coneTransfer(robot, "Update", telemetry, deposit);
-            }
-
-            intake.movingToGround = true;
-            double targetChange = 0;
-
-            sleep(300);
-
-            while (intake.movingToGround) {
-                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
-                intake.transferRunning = false;
-                intake.isConeBeingTransferred = false;
-
-                targetChange += 0.0008;
-
-                if (robot.V4B_1.getPosition() > intake.V4B_TransferPos + 0.05) {
-                    robot.claw.setPosition(intake.closedClawPos);
-                }
-
-                if (robot.V4B_1.getPosition() > i) {
-                    intake.movingToGround = false;
-                    robot.V4B_1.setPosition(i);
-                    robot.V4B_2.setPosition(i);
-                    robot.claw.setPosition(intake.openClawPos);
-                    robot.spinClaw.setPosition(intake.clawFowardPos);
-                    targetChange = 0;
-                } else {
-                    robot.V4B_1.setPosition(robot.V4B_1.getPosition() + targetChange);
-                    robot.V4B_2.setPosition(robot.V4B_1.getPosition() + targetChange);
-                }
-            }
-
-
-            sleep(300);
-
-            // Start the deposit "High" scoring program
-            deposit.runDeposit(robot, 0, "High", telemetry);
-
-            while (deposit.automationWasSet || deposit.zeroWasTargetted) {
-                telemetry.addData("Rotation Encoder: ", intake.getRotationDegrees(intake.updateRotateClaw(robot, intake.increment), telemetry));
-                deposit.runDeposit(robot, 0, "Update", telemetry);
-
-                if (!(j == cycleNumber-1)) {
-                    // Run to mid position
-                    robot.intakeLeft.setTargetPosition(intakeAutoCycle + 300);
-                    robot.intakeRight.setTargetPosition(intakeAutoCycle + 300);
-                    robot.intakeLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    robot.intakeRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    robot.intakeLeft.setPower(1);
-                    robot.intakeRight.setPower(1);
-                } else if (j == cycleNumber-1) {
-                    robot.V4B_1.setPosition(intake.V4B_IdlePos);
-                    robot.V4B_2.setPosition(intake.V4B_IdlePos);
-                }
-            }
+            // Move the robot to the correct parking position
+        if (parkingLocation == "LEFT") {
+            drive.followTrajectorySequence(driveToLeftParkingPosRightAuto);
+        } else if (parkingLocation == "MIDDLE" || parkingLocation == "NOT FOUND") {
+            drive.followTrajectorySequence(driveToMiddleParkingPosRightAuto);
+        } else if (parkingLocation == "RIGHT") {
+            drive.followTrajectorySequence(driveToRightParkingPosRightAuto);
         }
 
-//            // Move the robot to the correct parking position
-//        if (parkingLocation == "LEFT") {
-//            drive.followTrajectorySequence(driveToLeftParkingPosRightAuto);
-//        } else if (parkingLocation == "MIDDLE" || parkingLocation == "NOT FOUND") {
-//            drive.followTrajectorySequence(driveToMiddleParkingPosRightAuto);
-//        } else if (parkingLocation == "RIGHT") {
-//            drive.followTrajectorySequence(driveToRightParkingPosRightAuto);
-//        }
-//
 
     }
 }

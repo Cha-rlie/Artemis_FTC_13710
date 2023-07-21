@@ -46,12 +46,16 @@ public class Artemis_Auto_Just_Parking extends LinearOpMode {
 
         TrajectorySequence autoJustParkLeft = drive.trajectorySequenceBuilder(startPos)
                 .forward(36)
-                .strafeLeft(19)
+                .turn(Math.toRadians(90))
+                .forward(19)
+                //.strafeLeft(19)
                 .build();
 
         TrajectorySequence autoJustParkRight = drive.trajectorySequenceBuilder(startPos)
                 .forward(36)
-                .strafeRight(19)
+                .turn(Math.toRadians(-90))
+                .forward(19)
+                //.strafeRight(19)
                 .back(1)
                 .build();
 

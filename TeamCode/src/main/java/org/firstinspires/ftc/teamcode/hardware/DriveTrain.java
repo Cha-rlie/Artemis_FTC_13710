@@ -41,7 +41,7 @@ public class DriveTrain {
         double x = gamepad1.right_stick_x * 1.1; // Counteract imperfect strafing
         double rx = gamepad1.left_stick_x;
 
-        double speedModifier = 0.7;
+        double speedModifier = 1; //Used to be 0.7
 
         if (gamepad1.left_bumper) {
             speedModifier = 0.3;

@@ -46,7 +46,7 @@ public class Artemis_TeleOp extends LinearOpMode {
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
 
-            telemetry.addData("Distance", robot.distanceSensor.getDistance(DistanceUnit.CM));
+            //telemetry.addData("Distance", robot.distanceSensor.getDistance(DistanceUnit.CM));
 
             driveTrain.runDriveTrain(robot, telemetry, this.gamepad1);
 

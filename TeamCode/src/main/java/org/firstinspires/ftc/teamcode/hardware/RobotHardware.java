@@ -84,8 +84,6 @@ public class RobotHardware {
 
         imu = hardwareMap.get(IMU.class, "imu");
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "clawDistance");
-
         this.enabled = true;
     }
 
