@@ -43,8 +43,10 @@ public class Artemis_TeleOp extends LinearOpMode {
 
         int latchPos = 0;
 
+
         // Run until the "Stop" button is pressed
         while (opModeIsActive()) {
+
 
             //telemetry.addData("Distance", robot.distanceSensor.getDistance(DistanceUnit.CM));
 
@@ -246,6 +248,7 @@ public class Artemis_TeleOp extends LinearOpMode {
             telemetry.update();
 
         }
+
 
     }
 

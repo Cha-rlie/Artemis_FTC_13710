@@ -55,7 +55,7 @@ public class RobotHardware {
         frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
         rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
         rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
-        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // Initialising the motors for the dual-intake system
